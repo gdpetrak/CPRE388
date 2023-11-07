@@ -58,7 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -106,12 +106,32 @@
 
                 </LinearLayout>
 
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:id="@+id/mood_entry"
+                    android:gravity="start|top"
+                    android:inputType="textMultiLine"
+                    android:layout_marginHorizontal="10sp"/>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/mood_entry"
-                    android:text="@string/lorem_ipsum"
-                    android:layout_marginHorizontal="10sp"/>
+                    android:layout_marginHorizontal="10sp"
+                    android:text="Mood Rating"
+                    android:labelFor="@+id/mood_rating"
+                    android:layout_gravity="start"/>
+
+                <com.google.android.material.slider.Slider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10sp"
+                    android:id="@+id/mood_rating"
+                    android:stepSize="1"
+                    android:value="3"
+                    android:valueFrom="1"
+                    android:valueTo="5"/>
 
                 <Button
                     android:layout_width="wrap_content"
