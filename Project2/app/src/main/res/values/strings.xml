@@ -6,4 +6,12 @@
     <string name="sign_in">Sign In</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="lorem_ipsum">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Vestibulum bibendum dui ornare tellus finibus, vel tristique eros tincidunt.
+        In laoreet ipsum a accumsan imperdiet.
+        Praesent iaculis neque ligula, non tincidunt magna faucibus non.
+    </string>
+    <string name="close">Close</string>
+    <string name="post">Post</string>
 </resources>
