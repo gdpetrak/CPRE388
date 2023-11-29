@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Project 2</string>
     <string name="home_page">Home Page</string>
+    <string name="profile_page">Profile</string>
     <string name="welcome">Welcome to\nMood\nJournal</string>
     <string name="register">Register</string>
     <string name="sign_in">Sign In</string>

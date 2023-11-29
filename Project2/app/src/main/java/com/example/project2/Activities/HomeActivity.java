@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
@@ -32,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         // Layout reference init
-        ImageButton createPostButton = findViewById(R.id.create_post_button);
+        ImageButton createPostButton = findViewById(R.id.back_button);
         Button closeCreatePostPopupButton = findViewById(R.id.close_create_post);
         Button postCreatedPost = findViewById(R.id.post);
         ImageButton accountButton = findViewById(R.id.profile_button);
@@ -88,8 +87,8 @@ public class HomeActivity extends AppCompatActivity {
         accountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuth.signOut();
-                startActivity(new Intent(HomeActivity.this, LandingActivity.class));
+              //  mAuth.signOut();
+                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
             }
         });
     }
