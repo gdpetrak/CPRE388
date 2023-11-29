@@ -1,10 +1,14 @@
 package com.example.project2.Activities;
 
 
+import static android.content.ContentValues.TAG;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,15 +19,20 @@ import android.widget.TextView;
 import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
 import com.example.project2.util.FirebaseUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.slider.Slider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Collection;
 
 public class HomeActivity extends AppCompatActivity {
+    private static final String USERNAME_COLLECTION = "users";
     private static final String POST_COLLECTION_LOCATION = "moodPosts";
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
@@ -90,6 +99,19 @@ public class HomeActivity extends AppCompatActivity {
         accountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mFirestore.collection(USERNAME_COLLECTION).whereEqualTo("uid", user.getUid()).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                                        Log.d(TAG, documentSnapshot.getId() + "=>" + documentSnapshot.getData());
+//                                        documentSnapshot.ref.path;
+
+                                    }
+                                }
+                            }
+                        });
 //                mAuth.signOut();
 //                startActivity(new Intent(HomeActivity.this, LandingActivity.class));
             }
