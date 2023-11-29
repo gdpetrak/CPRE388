@@ -21,6 +21,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.Collection;
+
 public class HomeActivity extends AppCompatActivity {
     private static final String POST_COLLECTION_LOCATION = "moodPosts";
     private FirebaseFirestore mFirestore;
@@ -69,7 +71,7 @@ public class HomeActivity extends AppCompatActivity {
         postCreatedPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int postId = -1; // TODO get post id from server (ideally just make it count up)
+                String postId = "-1";
                 String posterId = user.getUid();
                 String moodEntry = createPostEntryInput.getText().toString();
                 int moodRating = (int) createPostMoodInput.getValue();
@@ -88,8 +90,8 @@ public class HomeActivity extends AppCompatActivity {
         accountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuth.signOut();
-                startActivity(new Intent(HomeActivity.this, LandingActivity.class));
+//                mAuth.signOut();
+//                startActivity(new Intent(HomeActivity.this, LandingActivity.class));
             }
         });
     }

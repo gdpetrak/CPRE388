@@ -13,15 +13,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.project2.Database.User;
 import com.example.project2.R;
 import com.example.project2.util.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RegisterActivity extends AppCompatActivity {
+    private static final String USERNAME_COLLECTION = "users";
     private FirebaseAuth mAuth;
+    private FirebaseFirestore mFirestore;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
         EditText passwordInput = ((EditText) findViewById(R.id.password));
 
         // Firebase stuff
+        mFirestore = FirebaseUtil.getFirestore();
         mAuth = FirebaseUtil.getAuth();
 
         register.setOnClickListener(new View.OnClickListener() {
@@ -52,7 +59,17 @@ public class RegisterActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     Log.d(TAG, "createUserWithEmail:success");
-                                    startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+
+                                    // Create username userid combo
+                                    CollectionReference usernameReference = mFirestore.collection(USERNAME_COLLECTION);
+                                    User currentUser = new User("cthomp01", mAuth.getUid());
+                                    usernameReference.add(currentUser).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DocumentReference> task) {
+                                            // Push to home screen
+                                            startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
+                                        }
+                                    });
                                 } else {
                                     Log.d(TAG, "createUserWithEmail:failure", task.getException());
                                     // TODO make a pop up here telling user why it failed.
