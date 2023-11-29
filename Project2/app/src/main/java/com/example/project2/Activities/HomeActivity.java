@@ -3,6 +3,7 @@ package com.example.project2.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -34,6 +35,7 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton createPostButton = findViewById(R.id.create_post_button);
         Button closeCreatePostPopupButton = findViewById(R.id.close_create_post);
         Button postCreatedPost = findViewById(R.id.post);
+        ImageButton accountButton = findViewById(R.id.profile_button);
         LinearLayout createPostPopup = findViewById(R.id.create_post_popup);
 
         // Input reference init
@@ -49,6 +51,7 @@ public class HomeActivity extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
 
+        // CREATE POST CODE
         createPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,6 +81,15 @@ public class HomeActivity extends AppCompatActivity {
                 // Send post to database and hide popup
                 moodPostsCollection.add(post);
                 createPostPopup.setVisibility(View.GONE);
+            }
+        });
+
+        // ACCOUNT CODE
+        accountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.signOut();
+                startActivity(new Intent(HomeActivity.this, LandingActivity.class));
             }
         });
     }

@@ -21,7 +21,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterActivity extends AppCompatActivity {
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +54,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     Log.d(TAG, "createUserWithEmail:success");
                                     startActivity(new Intent(RegisterActivity.this, HomeActivity.class));
                                 } else {
-                                    Log.d(TAG, "createUserWithEmail:success", task.getException());
+                                    Log.d(TAG, "createUserWithEmail:failure", task.getException());
                                     // TODO make a pop up here telling user why it failed.
                                 }
                             }
