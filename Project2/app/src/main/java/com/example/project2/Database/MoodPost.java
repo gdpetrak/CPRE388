@@ -3,11 +3,11 @@ package com.example.project2.Database;
 import java.util.Date;
 
 public class MoodPost {
-    private int postId, posterId, moodRating;
-    private String moodEntry;
+    private int postId, moodRating;
+    private String moodEntry, posterId;
     private Date postTime;
 
-    public MoodPost(int postId, int posterId, String moodEntry, int moodRating) {
+    public MoodPost(int postId, String posterId, String moodEntry, int moodRating) {
         this.postId = postId;
         this.posterId = posterId;
         this.moodEntry = moodEntry;
@@ -19,7 +19,7 @@ public class MoodPost {
         return postId;
     }
 
-    public int getPosterId() {
+    public String getPosterId() {
         return posterId;
     }
 

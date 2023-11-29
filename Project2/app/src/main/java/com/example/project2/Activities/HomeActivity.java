@@ -13,22 +13,41 @@ import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
+import com.example.project2.util.FirebaseUtil;
 import com.google.android.material.slider.Slider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class HomeActivity extends AppCompatActivity {
+    private static final String POST_COLLECTION_LOCATION = "moodPosts";
+    private FirebaseFirestore mFirestore;
+    private CollectionReference moodPostsCollection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // Layout reference init
         ImageButton createPostButton = findViewById(R.id.create_post_button);
         Button closeCreatePostPopupButton = findViewById(R.id.close_create_post);
         Button postCreatedPost = findViewById(R.id.post);
         LinearLayout createPostPopup = findViewById(R.id.create_post_popup);
 
+        // Input reference init
         EditText createPostEntryInput = ((EditText) findViewById(R.id.mood_entry));
         Slider createPostMoodInput = findViewById(R.id.mood_rating);
+
+        // Init firebase
+        FirebaseFirestore.setLoggingEnabled(true);
+        mFirestore = FirebaseUtil.getFirestore();
+        moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
+
+        // Init user
+        FirebaseAuth mAuth = FirebaseUtil.getAuth();
+        FirebaseUser user = mAuth.getCurrentUser();
 
         createPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +67,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int postId = -1; // TODO get post id from server (ideally just make it count up)
-                int posterId = -1; // TODO get poster id from server (requires login)
+                String posterId = user.getUid();
                 String moodEntry = createPostEntryInput.getText().toString();
                 int moodRating = (int) createPostMoodInput.getValue();
                 MoodPost post = new MoodPost(postId, posterId, moodEntry, moodRating);
@@ -56,10 +75,8 @@ public class HomeActivity extends AppCompatActivity {
                 // Reset the edit text
                 createPostEntryInput.setText("");
 
-                // TODO send post to the database
-                System.out.printf("Post Info:\n   PostId: %d\n   PosterId: %d\n   " +
-                        "Entry: %s\n   Rating: %d\n", post.getPostId(), post.getPosterId(),
-                        post.getMoodEntry(), post.getMoodRating());
+                // Send post to database and hide popup
+                moodPostsCollection.add(post);
                 createPostPopup.setVisibility(View.GONE);
             }
         });
