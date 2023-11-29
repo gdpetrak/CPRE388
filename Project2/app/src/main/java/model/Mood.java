@@ -1,6 +1,7 @@
 package model;
 
 import com.google.firebase.firestore.IgnoreExtraProperties;
+import com.google.firebase.auth.FirebaseUser;
 @IgnoreExtraProperties
 public class Mood {
     private String user;
@@ -9,8 +10,8 @@ public class Mood {
     private int moodDate;
     private String quote;
 
-    public Mood(String user, int moodRating, int moodTrend, int moodDate, String quote){
-        this.user = user;
+    public Mood(FirebaseUser user, int moodRating, int moodTrend, int moodDate, String quote){
+        this.user = user.getDisplayName();
         this.moodRating = moodRating;
         this.moodTrend = moodTrend;
         this.moodDate = moodDate;
