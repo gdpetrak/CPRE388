@@ -57,21 +57,21 @@ public class ProfileActivity extends AppCompatActivity{
         LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
                 // on below line we are adding
                 // each point on our x and y axis.
-                new DataPoint(0, 1),
+
+//                new DataPoint(1, 1),
+//                new DataPoint(1, 5),
                 new DataPoint(1, 3),
                 new DataPoint(2, 4),
-                new DataPoint(3, 9),
-                new DataPoint(4, 6),
+                new DataPoint(3, 5),
+                new DataPoint(4, 5),
                 new DataPoint(5, 3),
-                new DataPoint(6, 6),
-                new DataPoint(7, 1),
-                new DataPoint(8, 2)
+
         });
 
         // after adding data to our line graph series.
         // on below line we are setting
         // title for our graph view.
-        graphView.setTitle("My Graph View");
+        graphView.setTitle("My Mood Trend");
 
         // on below line we are setting
         // text color to our graph view.
@@ -79,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity{
 
         // on below line we are setting
         // our title text size.
-        graphView.setTitleTextSize(18);
+        graphView.setTitleTextSize(50);
 
         // on below line we are adding
         // data series to our graph view.
