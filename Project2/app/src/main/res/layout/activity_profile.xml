@@ -23,7 +23,7 @@
             android:src="@android:drawable/ic_menu_myplaces"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textView"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!--line graph view where we will
@@ -45,14 +45,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginEnd="296dp"
-            app:layout_constraintHorizontal_bias="1.0"
             android:rotation="-90"
+            android:rotationX="0"
+            android:rotationY="0"
+
             android:src="@android:drawable/stat_sys_upload_done"
 
             app:layout_constraintBottom_toBottomOf="parent"
-
-            app:layout_constraintEnd_toStartOf="@+id/profile_button"
+            app:layout_constraintEnd_toStartOf="@+id/textView"
+            app:layout_constraintHorizontal_bias="0.043"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@android:drawable/stat_sys_upload_done" />
