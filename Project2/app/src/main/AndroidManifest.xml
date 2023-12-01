@@ -30,12 +30,8 @@
         <activity
             android:name=".Activities.SignInActivity"
             android:exported="false"/>
-<<<<<<< Updated upstream
-        <activity android:name=".Activities.ProfileActivity"
-=======
         <activity
             android:name=".Activities.ProfileActivity"
->>>>>>> Stashed changes
             android:exported="false"/>
     </application>
 

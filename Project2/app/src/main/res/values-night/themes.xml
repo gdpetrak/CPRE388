@@ -4,4 +4,11 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
     </style>
+
+    <style name="Button.Default" parent="ThemeOverlay.AppCompat">
+        <item name="colorAccent">@color/primary_700</item>
+    </style>
+    <style name="Button.Attention" parent="ThemeOverlay.AppCompat">
+        <item name="colorAccent">@color/attention</item>
+    </style>
 </resources>

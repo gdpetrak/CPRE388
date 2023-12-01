@@ -87,7 +87,6 @@ public class HomeActivity extends AppCompatActivity {
         accountButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              //  mAuth.signOut();
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
             }
         });

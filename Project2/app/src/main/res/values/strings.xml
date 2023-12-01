@@ -15,4 +15,7 @@
     </string>
     <string name="close">Close</string>
     <string name="post">Post</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="home">Home</string>
 </resources>

@@ -1,4 +1,6 @@
 package com.example.project2.Activities;
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -52,8 +54,9 @@ public class ProfileActivity extends AppCompatActivity{
         mFirestore = FirebaseUtil.getFirestore();
         moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
 
-        ImageButton backButton = findViewById(R.id.back_button);
-        ImageButton accountButton = findViewById(R.id.profile_button);
+        Button backButton = findViewById(R.id.back_button);
+        Button signOutButton = findViewById(R.id.sign_out);
+        Button deleteAccountButton = findViewById(R.id.delete_account);
         moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -109,7 +112,7 @@ public class ProfileActivity extends AppCompatActivity{
             }
         });
 
-        accountButton.setOnClickListener(new View.OnClickListener() {
+        signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mAuth.signOut();
@@ -117,42 +120,22 @@ public class ProfileActivity extends AppCompatActivity{
             }
         });
 
-<<<<<<< Updated upstream
-        // on below line we are initializing our graph view.
-        graphView = findViewById(R.id.idGraphView);
-
-        // on below line we are adding data to our graph view.
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
-                // on below line we are adding
-                // each point on our x and y axis.
-
-//                new DataPoint(1, 1),
-//                new DataPoint(1, 5),
-                new DataPoint(1, 3),
-                new DataPoint(2, 4),
-                new DataPoint(3, 5),
-                new DataPoint(4, 5),
-                new DataPoint(5, 3),
-
+        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                assert user != null;
+                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "deleteAccount:success");
+                            startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
+                        } else {
+                            Log.d(TAG, "deleteAccount:failed ==> " + task.getException());
+                        }
+                    }
+                });
+            }
         });
-
-        // after adding data to our line graph series.
-        // on below line we are setting
-        // title for our graph view.
-        graphView.setTitle("My Mood Trend");
-
-        // on below line we are setting
-        // text color to our graph view.
-        graphView.setTitleColor(R.color.black);
-
-        // on below line we are setting
-        // our title text size.
-        graphView.setTitleTextSize(50);
-
-        // on below line we are adding
-        // data series to our graph view.
-        graphView.addSeries(series);
-=======
->>>>>>> Stashed changes
     }
 }
