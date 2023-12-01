@@ -4,6 +4,9 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +43,7 @@ public class ProfileActivity extends AppCompatActivity{
     private CollectionReference moodPostsCollection;
     int[] userX = new int[5];
     int[] userY = new int[5];
-    int i = 0;
+    int i = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +57,59 @@ public class ProfileActivity extends AppCompatActivity{
         mFirestore = FirebaseUtil.getFirestore();
         moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
 
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setMessage("Are you sure you want to delete your account?\n" +
+                "(Once an account is deleted, there is no way to recover it)")
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        assert user != null;
+                        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "deleteAccount:success");
+                                    startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
+                                } else {
+                                    Log.d(TAG, "deleteAccount:failed ==> " + task.getException());
+                                }
+                            }
+                        });
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        Dialog deleteAccountAlert = alertBuilder.create();
+
         Button backButton = findViewById(R.id.back_button);
         Button signOutButton = findViewById(R.id.sign_out);
         Button deleteAccountButton = findViewById(R.id.delete_account);
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
+            }
+        });
+
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.signOut();
+                startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
+            }
+        });
+
+        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteAccountAlert.show();
+            }
+        });
+
         moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -65,8 +118,8 @@ public class ProfileActivity extends AppCompatActivity{
                         if (document.getString("posterId").equals(user.getUid())) {
                             // Need to establish order once postId has been correctly implemented
                             userY[i] = document.getLong("moodRating").intValue();
-                            i++;
-                            if (i > 4) {
+                            i--;
+                            if (i < 0) {
                                 break;
                             }
                         }
@@ -76,8 +129,6 @@ public class ProfileActivity extends AppCompatActivity{
                     LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
                             // on below line we are adding
                             // each point on our x and y axis.
-                            new DataPoint(1, 1),
-                            new DataPoint(1, 5),
                             new DataPoint(1, userY[4]),
                             new DataPoint(2, userY[3]),
                             new DataPoint(3, userY[2]),
@@ -102,39 +153,6 @@ public class ProfileActivity extends AppCompatActivity{
                     // data series to our graph view.
                     graphView.addSeries(series);
                 }
-            }
-        });
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
-            }
-        });
-
-        signOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signOut();
-                startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
-            }
-        });
-
-        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                assert user != null;
-                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "deleteAccount:success");
-                            startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
-                        } else {
-                            Log.d(TAG, "deleteAccount:failed ==> " + task.getException());
-                        }
-                    }
-                });
             }
         });
     }
