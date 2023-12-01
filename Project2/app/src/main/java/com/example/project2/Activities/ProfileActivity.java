@@ -36,7 +36,21 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-public class ProfileActivity extends AppCompatActivity{
+import java.util.Random;
+
+public class ProfileActivity extends AppCompatActivity {
+
+    String[] quotes = {"It does not matter how slowly you go as long as you do not stop.",
+            "Quality is not an act, it is a habit.",
+            "Life is 10% what happens to you and 90% how you react to it.",
+            "It always seems impossible until it's done.",
+            "Good, better, best. Never let it rest. 'Til your good is better and your better is best.",
+            "With the new day comes new strength and new thoughts.",
+            "When something is important enough, you do it even if the odds are not in your favor.",
+            "Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.",
+            "Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.",
+            "If you can dream it, you can do it."};
+
     GraphView graphView;
     private static final String POST_COLLECTION_LOCATION = "moodPosts";
     private FirebaseFirestore mFirestore;
@@ -50,6 +64,7 @@ public class ProfileActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Init firebase
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
 
@@ -57,6 +72,7 @@ public class ProfileActivity extends AppCompatActivity{
         mFirestore = FirebaseUtil.getFirestore();
         moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
 
+        // Init alert builder
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setMessage("Are you sure you want to delete your account?\n" +
                 "(Once an account is deleted, there is no way to recover it)")
@@ -84,10 +100,13 @@ public class ProfileActivity extends AppCompatActivity{
                 });
         Dialog deleteAccountAlert = alertBuilder.create();
 
+        // Init layout references
         Button backButton = findViewById(R.id.back_button);
         Button signOutButton = findViewById(R.id.sign_out);
         Button deleteAccountButton = findViewById(R.id.delete_account);
+        TextView motivationalQuotes = findViewById(R.id.motivation);
 
+        // Init button on click actions
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,6 +129,11 @@ public class ProfileActivity extends AppCompatActivity{
             }
         });
 
+        // Set up the quotes
+        Random r = new Random();
+        motivationalQuotes.setText(quotes[r.nextInt(quotes.length)]);
+
+        // Render the graphs
         moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
