@@ -36,6 +36,7 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.List;
 import java.util.Random;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -53,8 +54,10 @@ public class ProfileActivity extends AppCompatActivity {
 
     GraphView graphView;
     private static final String POST_COLLECTION_LOCATION = "moodPosts";
+    private static final String USER_COLLECTION_LOCATION = "users";
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
+    private CollectionReference usersCollection;
     int[] userX = new int[5];
     int[] userY = new int[5];
     int i = 4;
@@ -71,6 +74,7 @@ public class ProfileActivity extends AppCompatActivity {
         FirebaseFirestore.setLoggingEnabled(true);
         mFirestore = FirebaseUtil.getFirestore();
         moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
+        usersCollection = mFirestore.collection(USER_COLLECTION_LOCATION);
 
         // Init alert builder
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
@@ -105,6 +109,22 @@ public class ProfileActivity extends AppCompatActivity {
         Button signOutButton = findViewById(R.id.sign_out);
         Button deleteAccountButton = findViewById(R.id.delete_account);
         TextView motivationalQuotes = findViewById(R.id.motivation);
+        TextView usernameDisplay = findViewById(R.id.username_display);
+
+        // Init username display
+        usersCollection.whereEqualTo("uid", user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot documentSnapshot = task.getResult();
+                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                            if (documentSnapshotList.size() > 0) {
+                                usernameDisplay.setText(documentSnapshotList.get(0).get("username").toString());
+                            }
+                        }
+                    }
+                });
 
         // Init button on click actions
         backButton.setOnClickListener(new View.OnClickListener() {
