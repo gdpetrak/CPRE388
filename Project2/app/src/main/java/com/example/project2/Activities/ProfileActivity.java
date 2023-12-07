@@ -38,6 +38,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 public class ProfileActivity extends AppCompatActivity{
@@ -69,6 +70,32 @@ public class ProfileActivity extends AppCompatActivity{
         Button backButton = findViewById(R.id.back_button);
         Button signOutButton = findViewById(R.id.sign_out);
         Button deleteAccountButton = findViewById(R.id.delete_account);
+
+        TextView motivation = findViewById(R.id.quoteText);
+        Random rand = new Random();
+        int randNum = rand.nextInt();
+        if ((randNum % 10) == 0) {
+            motivation.setText(R.string.mq1);
+        } else if ((randNum % 10) == 1) {
+            motivation.setText(R.string.mq2);
+        } else if ((randNum % 10) == 2) {
+            motivation.setText(R.string.mq3);
+        } else if ((randNum % 10) == 3) {
+            motivation.setText(R.string.mq4);
+        } else if ((randNum % 10) == 4) {
+            motivation.setText(R.string.mq5);
+        } else if ((randNum % 10) == 5) {
+            motivation.setText(R.string.mq6);
+        } else if ((randNum % 10) == 6) {
+            motivation.setText(R.string.mq7);
+        } else if ((randNum % 10) == 7) {
+            motivation.setText(R.string.mq8);
+        } else if ((randNum % 10) == 8) {
+            motivation.setText(R.string.mq9);
+        } else if ((randNum % 10) == 9) {
+            motivation.setText(R.string.mq10);
+        }
+
         moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

@@ -85,5 +85,16 @@
             android:text="@string/delete_account" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/quoteText"
+        android:layout_width="347dp"
+        android:layout_height="58dp"
+        android:text="@string/mq1"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/accountManagement"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/idGraphView" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
