@@ -21,26 +21,34 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 public class ProfileActivity extends AppCompatActivity{
     GraphView graphView;
     private static final String POST_COLLECTION_LOCATION = "moodPosts";
+    private static final String POST_TIME_FIELD = "postTime";
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
-    int[] userX = new int[5];
+    Timestamp[] timestamps = new Timestamp[5];
     int[] userY = new int[5];
-    int i = 0;
+    int i = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +60,10 @@ public class ProfileActivity extends AppCompatActivity{
 
         FirebaseFirestore.setLoggingEnabled(true);
         mFirestore = FirebaseUtil.getFirestore();
+        for (int j = 0; j < 5; j++) {
+            timestamps[j] = new Timestamp(0, 0);
+        }
+
         moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
 
         Button backButton = findViewById(R.id.back_button);
@@ -63,11 +75,21 @@ public class ProfileActivity extends AppCompatActivity{
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (document.getString("posterId").equals(user.getUid())) {
-                            // Need to establish order once postId has been correctly implemented
-                            userY[i] = document.getLong("moodRating").intValue();
-                            i++;
-                            if (i > 4) {
-                                break;
+                            i = 4;
+                            while (i > 0) {
+                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
+                                    shiftTimestamps(i, document.get("postTime", Timestamp.class));
+                                    userY[i] = document.getLong("moodRating").intValue();
+                                    i = -1;
+                                } else {
+                                    i--;
+                                }
+                            }
+                            if (i == 0) {
+                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
+                                    timestamps[i] = document.get("postTime", Timestamp.class);
+                                    userY[i] = document.getLong("moodRating").intValue();
+                                }
                             }
                         }
                     }
@@ -78,11 +100,11 @@ public class ProfileActivity extends AppCompatActivity{
                             // each point on our x and y axis.
                             new DataPoint(1, 1),
                             new DataPoint(1, 5),
-                            new DataPoint(1, userY[4]),
-                            new DataPoint(2, userY[3]),
+                            new DataPoint(1, userY[0]),
+                            new DataPoint(2, userY[1]),
                             new DataPoint(3, userY[2]),
-                            new DataPoint(4, userY[1]),
-                            new DataPoint(5, userY[0])
+                            new DataPoint(4, userY[3]),
+                            new DataPoint(5, userY[4])
                     });
 
                     // after adding data to our line graph series.
@@ -137,5 +159,13 @@ public class ProfileActivity extends AppCompatActivity{
                 });
             }
         });
+    }
+
+    private void shiftTimestamps(int i, Timestamp postTime) {
+        for (int j = 0; j < i; j++) {
+            timestamps[j] = timestamps[j+1];
+            userY[j] = userY[j+1];
+        }
+        timestamps[i] = postTime;
     }
 }
