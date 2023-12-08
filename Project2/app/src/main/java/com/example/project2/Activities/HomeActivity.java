@@ -107,8 +107,8 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Create the post
-                createPost(user.getUid(), createPostEntryInput.getText().toString(),
-                        (int) createPostMoodInput.getValue());
+               createPost(user.getUid(), createPostEntryInput.getText().toString(),
+                       (int) createPostMoodInput.getValue());
 
                 // Hide popup and reset text
                 createPostEntryInput.setText("");
@@ -139,7 +139,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updatePostDisplay() {
-        // DISPLAY POST CODE
         TextView postUsernameDisplay = findViewById(R.id.post_username_display);
         TextView postMoodEntryDisplay = findViewById(R.id.post_mood_entry_display);
         TextView postMoodRatingDisplay = findViewById(R.id.post_mood_rating_display);
@@ -149,13 +148,13 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            QuerySnapshot documentSnapshot = task.getResult();
-                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                            List<DocumentSnapshot> documentSnapshotList = task.getResult().getDocuments();
                             if (documentSnapshotList.size() > 0) {
                                 DocumentSnapshot post = documentSnapshotList.get(0);
-                                postMoodEntryDisplay.setText(Objects.requireNonNull(post.get("moodEntry")).toString());
-                                postMoodRatingDisplay.setText("Mood Rating: " +
-                                        Objects.requireNonNull(post.get("moodRating")).toString());
+                                String entry = post.get("moodEntry").toString();
+                                String rating = post.get("moodRating").toString();
+                                postMoodEntryDisplay.setText(entry);
+                                postMoodRatingDisplay.setText("Mood Rating: " + rating);
                             }
                         }
                     }
