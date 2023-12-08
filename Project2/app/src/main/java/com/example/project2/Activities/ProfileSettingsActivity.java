@@ -100,14 +100,12 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                finish();
-                addFriendButton(mFirestore);
-                System.out.println("addingFriend: finishedButton");
+                finish();
             }
         });
     }
 
-    private void addFriendButton(FirebaseFirestore mFirestore) {
+    private void addFriendButton(String friendId, FirebaseFirestore mFirestore) {
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -117,8 +115,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                     List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
                     if (documentSnapshotList.size() > 0) {
                         DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
-                        System.out.println("addingFriend: docref found " + docRef);
-                        Task<Void> tsk = addFriend("vYMg4DfmXzRQC0SQ4dyLbHIfZ7G3", docRef, mFirestore);
+                        Task<Void> tsk = addFriend(friendId, docRef, mFirestore);
                         if (tsk.isSuccessful()) {
                             System.out.println("addingFriend: taskSuccess");
                         } else {
@@ -131,14 +128,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
     }
 
     private Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
-        System.out.println("addingFriend: addFriendCalled");
         // Push to database
         return mFirestore.runTransaction(new Transaction.Function<Void>() {
             @Nullable
             @Override
             public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
-                System.out.println("addingFriend: applyTransaction");
-//                User currentUser = transaction.get(userRef).toObject(User.class);
                 DocumentSnapshot currUserDoc = transaction.get(userRef);
                 String username = currUserDoc.get("username").toString();
                 String uid = currUserDoc.get("uid").toString();
