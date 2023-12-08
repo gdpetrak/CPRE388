@@ -37,7 +37,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Input init
         Button register = findViewById(R.id.register);
-        EditText emailInput = ((EditText) findViewById(R.id.username));
+        EditText usernameInput = ((EditText) findViewById(R.id.username));
+        EditText emailInput = ((EditText) findViewById(R.id.email));
         EditText passwordInput = ((EditText) findViewById(R.id.password));
 
         // Firebase stuff
@@ -73,7 +74,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                                     // Create username userid combo
                                     CollectionReference usernameReference = mFirestore.collection(USERNAME_COLLECTION);
-                                    User currentUser = new User("cthomp01", mAuth.getUid());
+                                    User currentUser = new User(usernameInput.getText().toString(), mAuth.getUid());
                                     usernameReference.add(currentUser).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                         @Override
                                         public void onComplete(@NonNull Task<DocumentReference> task) {

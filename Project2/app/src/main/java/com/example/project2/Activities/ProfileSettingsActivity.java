@@ -12,8 +12,10 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.project2.Database.User;
 import com.example.project2.R;
 import com.example.project2.util.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,12 +23,21 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
+
+import java.util.List;
 
 public class ProfileSettingsActivity extends AppCompatActivity {
     private static final String USER_COLLECTION_LOCATION = "users";
     private CollectionReference usersCollection;
     private FirebaseFirestore mFirestore;
+    private FirebaseUser user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +45,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
 
         // Init firebase
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
-        FirebaseUser user = mAuth.getCurrentUser();
+        user = mAuth.getCurrentUser();
         FirebaseFirestore.setLoggingEnabled(true);
         mFirestore = FirebaseUtil.getFirestore();
         usersCollection = mFirestore.collection(USER_COLLECTION_LOCATION);
@@ -90,7 +101,46 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+//                finish();
+                addFriendButton(mFirestore);
+            }
+        });
+    }
+
+    private void addFriendButton(FirebaseFirestore mFirestore) {
+        usersCollection.whereEqualTo("uid", user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    QuerySnapshot documentSnapshot = task.getResult();
+                    List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                    if (documentSnapshotList.size() > 0) {
+                        DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
+                        addFriend("vYMg4DfmXzRQC0SQ4dyLbHIfZ7G3", docRef, mFirestore);
+                    }
+
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        DocumentReference docRef = usersCollection.document(document.getId());
+                    }
+                }
+            }
+        });
+    }
+
+    private Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
+        // Push to database
+        return mFirestore.runTransaction(new Transaction.Function<Void>() {
+            @Nullable
+            @Override
+            public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                User currentUser = transaction.get(userRef).toObject(User.class);
+
+                // Update current user friends list
+                currentUser.addFriend(friendUid);
+
+                transaction.set(userRef, currentUser);
+                return null;
             }
         });
     }

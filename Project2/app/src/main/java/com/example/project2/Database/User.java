@@ -47,22 +47,4 @@ public class User {
     public void addFriend(String friendUid) {
         friendlist.add(friendUid);
     }
-
-    public Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
-        // Push to database
-        return mFirestore.runTransaction(new Transaction.Function<Void>() {
-            @Nullable
-            @Override
-            public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
-                User currentUser = transaction.get(userRef).toObject(User.class);
-
-                // Update current user friends list
-                currentUser.addFriend(friendUid);
-                addFriend(friendUid);
-
-                transaction.set(userRef, currentUser);
-                return null;
-            }
-        });
-    }
 }

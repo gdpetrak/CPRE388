@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="@string/username"
+            android:text="@string/e_mail_address"
             android:labelFor="@id/username"
             tools:ignore="RtlHardcoded" />
 

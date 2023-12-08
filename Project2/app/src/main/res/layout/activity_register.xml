@@ -36,6 +36,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
+            android:text="@string/e_mail_address"
+            android:labelFor="@id/email"
+            tools:ignore="RtlHardcoded" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:importantForAutofill="no" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
             android:text="@string/password"
             android:labelFor="@id/password"
             tools:ignore="RtlHardcoded" />
