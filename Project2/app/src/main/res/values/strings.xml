@@ -30,4 +30,6 @@
     <string name="mq8">Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.</string>
     <string name="mq9">Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.</string>
     <string name="mq10">If you can dream it, you can do it.</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="back">Back</string>
 </resources>
