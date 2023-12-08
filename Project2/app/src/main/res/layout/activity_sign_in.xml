@@ -53,7 +53,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/sign_in"
             android:text="@string/sign_in"
-            android:theme="@style/Button.Default" />
+            android:theme="@style/Button.Default"
+            android:backgroundTint="@color/primary_700"/>
 
     </LinearLayout>
 

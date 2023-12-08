@@ -12,4 +12,5 @@
     <color name="primary_700">#ff75568a</color>
     <color name="primary_800">#ff5b436b</color>
     <color name="primary_900">#ff453352</color>
+    <color name="attention">#ffcc2c21</color>
 </resources>

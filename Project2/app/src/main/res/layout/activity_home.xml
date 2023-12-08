@@ -39,7 +39,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
-                android:id="@+id/create_post_button"
+                android:id="@+id/back_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -49,6 +49,58 @@
                 tools:src="@android:drawable/ic_menu_add" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/post1"
+            android:layout_width="350dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="TextView"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/primary_500">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/post2"
+            android:layout_width="350dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="TextView"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/primary_500">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/post3"
+            android:layout_width="350dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="TextView"
+            android:textAlignment="center"
+            android:textSize="18sp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/primary_500">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </LinearLayout>
 
@@ -94,6 +146,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.7"
+                        android:id="@+id/username_display"
                         android:text="@string/username" />
 
                     <Button
@@ -102,7 +155,8 @@
                         android:layout_weight="0.3"
                         android:id="@+id/close_create_post"
                         android:text="@string/close"
-                        android:theme="@style/Button.Default" />
+                        android:theme="@style/Button.Default"
+                        android:backgroundTint="@color/primary_700"/>
 
                 </LinearLayout>
 
@@ -139,7 +193,8 @@
                     android:id="@+id/post"
                     android:text="@string/post"
                     android:layout_marginHorizontal="10sp"
-                    android:layout_gravity="end"/>
+                    android:layout_gravity="end"
+                    android:backgroundTint="@color/primary_700"/>
 
             </LinearLayout>
 

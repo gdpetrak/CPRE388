@@ -2,6 +2,8 @@ package com.example.project2.Activities;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,6 +44,15 @@ public class RegisterActivity extends AppCompatActivity {
         mFirestore = FirebaseUtil.getFirestore();
         mAuth = FirebaseUtil.getAuth();
 
+        // Register failed alert
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,7 +83,8 @@ public class RegisterActivity extends AppCompatActivity {
                                     });
                                 } else {
                                     Log.d(TAG, "createUserWithEmail:failure", task.getException());
-                                    // TODO make a pop up here telling user why it failed.
+                                    alertBuilder.setMessage("Failed to register a new account\n" + task.getException());
+                                    alertBuilder.show();
                                 }
                             }
                         });
