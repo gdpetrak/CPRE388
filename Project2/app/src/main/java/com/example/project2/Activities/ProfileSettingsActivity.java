@@ -27,7 +27,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
@@ -103,6 +102,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
 //                finish();
                 addFriendButton(mFirestore);
+                System.out.println("addingFriend: finishedButton");
             }
         });
     }
@@ -117,11 +117,13 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                     List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
                     if (documentSnapshotList.size() > 0) {
                         DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
-                        addFriend("vYMg4DfmXzRQC0SQ4dyLbHIfZ7G3", docRef, mFirestore);
-                    }
-
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        DocumentReference docRef = usersCollection.document(document.getId());
+                        System.out.println("addingFriend: docref found " + docRef);
+                        Task<Void> tsk = addFriend("vYMg4DfmXzRQC0SQ4dyLbHIfZ7G3", docRef, mFirestore);
+                        if (tsk.isSuccessful()) {
+                            System.out.println("addingFriend: taskSuccess");
+                        } else {
+                            System.out.println("addingFriend: taskFailed");
+                        }
                     }
                 }
             }
@@ -129,12 +131,23 @@ public class ProfileSettingsActivity extends AppCompatActivity {
     }
 
     private Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
+        System.out.println("addingFriend: addFriendCalled");
         // Push to database
         return mFirestore.runTransaction(new Transaction.Function<Void>() {
             @Nullable
             @Override
             public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
-                User currentUser = transaction.get(userRef).toObject(User.class);
+                System.out.println("addingFriend: applyTransaction");
+//                User currentUser = transaction.get(userRef).toObject(User.class);
+                DocumentSnapshot currUserDoc = transaction.get(userRef);
+                String username = currUserDoc.get("username").toString();
+                String uid = currUserDoc.get("uid").toString();
+                List<String> friends = (List<String>) currUserDoc.get("friends");
+
+                User currentUser = new User(username, uid);
+                for (String friend : friends) {
+                    currentUser.addFriend(friend);
+                }
 
                 // Update current user friends list
                 currentUser.addFriend(friendUid);

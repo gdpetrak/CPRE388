@@ -18,13 +18,12 @@ public class User {
     private String username;
     private String uid;
 //    private ArrayList<User> friends;
-    private List<String> friendlist;
+    private List<String> friends;
 
     public User(String username, String uid) {
         this.username = username;
         this.uid = uid;
-        friendlist = new ArrayList<>();
-        friendlist.add(uid);
+        friends = new ArrayList<>();
     }
 
     public void updateUsername(String username) {
@@ -41,10 +40,10 @@ public class User {
     }
 
     public List<String> getFriends() {
-        return friendlist;
+        return friends;
     }
 
     public void addFriend(String friendUid) {
-        friendlist.add(friendUid);
+        friends.add(friendUid);
     }
 }
