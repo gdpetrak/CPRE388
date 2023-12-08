@@ -1,6 +1,7 @@
 package com.example.project2.Activities;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -10,26 +11,42 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
 import com.example.project2.util.FirebaseUtil;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.slider.Slider;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String POST_COLLECTION_LOCATION = "moodPosts";
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
+    Timestamp[] timestamps = new Timestamp[3];
+    private int i;
+    private int[] rating = new int[3];
+    private String[] moodEntry = new String[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        for (int j = 0; j < 3; j++) {
+            timestamps[j] = new Timestamp(0, 0);
+
+        }
         // Layout reference init
         ImageButton createPostButton = findViewById(R.id.back_button);
         Button closeCreatePostPopupButton = findViewById(R.id.close_create_post);
@@ -90,5 +107,66 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
             }
         });
+
+        TextView recentPost1 = findViewById(R.id.post1);
+        TextView recentPost2 = findViewById(R.id.post2);
+        TextView recentPost3 = findViewById(R.id.post3);
+
+        moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (document.getString("posterId").equals(user.getUid())) {
+                            i = 2;
+                            while (i > 0) {
+                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
+                                    shiftTimestamps(i, document.get("postTime", Timestamp.class));
+                                    rating[i] = document.getLong("moodRating").intValue();
+                                    moodEntry[i] = document.getString("moodEntry");
+                                    i = -1;
+                                } else {
+                                    i--;
+                                }
+                            }
+                            if (i == 0) {
+                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
+                                    timestamps[i] = document.get("postTime", Timestamp.class);
+                                    rating[i] = document.getLong("moodRating").intValue();
+                                    moodEntry[i] = document.getString("moodEntry");
+                                }
+                            }
+                        }
+                    }
+                    if(moodEntry[0].isEmpty()){
+                        recentPost3.setText("Make a Mood Entry to see it appear here!");
+                    }else{
+                        recentPost3.setText("Date posted: " + timestamps[0].toDate() + '\n' + '\n' + "Your mood entry: " + moodEntry[0]+ '\n' + '\n' +"Your mood rating: " + rating[0]);
+
+                    }
+                    if(moodEntry[1].isEmpty()){
+                        recentPost2.setText("Make a mood entry to see it appear here!");
+                    }else{
+                        recentPost2.setText("Date posted: " + timestamps[1].toDate() + '\n' + '\n' +"Your mood entry: " + moodEntry[1]+ '\n' + '\n' + "Your mood rating: " + rating[1]);
+
+                    }
+                    if (moodEntry[2].isEmpty()){
+                        recentPost1.setText("Make a mood entry to see it appear here!");
+                    }else {
+                        recentPost1.setText("Date posted: " + timestamps[2].toDate() + '\n' + '\n' + "Your mood entry: " + moodEntry[2]+ '\n' + '\n' + "Your mood rating: " + rating[2]);
+                    }
+                }
+            }
+
+        });
+
+    }
+    private void shiftTimestamps ( int i, Timestamp postTime){
+        for (int j = 0; j < i; j++) {
+            timestamps[j] = timestamps[j + 1];
+            rating[j] = rating[j + 1];
+            moodEntry[j] = moodEntry[j+1];
+        }
+        timestamps[i] = postTime;
     }
 }
