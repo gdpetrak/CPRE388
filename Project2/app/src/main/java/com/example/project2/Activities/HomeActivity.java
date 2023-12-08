@@ -10,11 +10,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
 import com.example.project2.util.FirebaseUtil;
+import com.example.project2.util.IndividualPostAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.slider.Slider;
@@ -25,8 +27,12 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.checkerframework.checker.units.qual.A;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,6 +47,11 @@ public class HomeActivity extends AppCompatActivity {
     private int[] rating = new int[3];
     private String[] moodEntry = new String[3];
     private CollectionReference usersCollection;
+
+    IndividualPostAdapter postAdapter;
+    ArrayList<String> usernamesView = new ArrayList<>();
+    ArrayList<String> moodEntryView = new ArrayList<>();
+    ArrayList<String> moodRatingView = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +69,11 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton accountButton = findViewById(R.id.profile_button);
         LinearLayout createPostPopup = findViewById(R.id.create_post_popup);
         TextView usernameDisplay = findViewById(R.id.username_display);
+
+        // Post list init
+        ListView listView = (ListView) findViewById(R.id.post_list);
+        postAdapter = new IndividualPostAdapter(getApplicationContext(), usernamesView, moodEntryView, moodRatingView);
+        listView.setAdapter(postAdapter);
 
         // Input reference init
         EditText createPostEntryInput = ((EditText) findViewById(R.id.mood_entry));
@@ -130,6 +146,9 @@ public class HomeActivity extends AppCompatActivity {
     private void createPost(String posterId, String moodEntry, int moodRating) {
         MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
         moodPostsCollection.add(post);
+        usernamesView.add("new thing");
+        moodEntryView.add("new thing but body");
+        moodRatingView.add("4");
         updatePostDisplay();
     }
 
@@ -139,23 +158,19 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updatePostDisplay() {
-        TextView postUsernameDisplay = findViewById(R.id.post_username_display);
-        TextView postMoodEntryDisplay = findViewById(R.id.post_mood_entry_display);
-        TextView postMoodRatingDisplay = findViewById(R.id.post_mood_rating_display);
-
-        moodPostsCollection.orderBy("postTime", Query.Direction.DESCENDING).get()
+        moodPostsCollection.orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             List<DocumentSnapshot> documentSnapshotList = task.getResult().getDocuments();
-                            if (documentSnapshotList.size() > 0) {
-                                DocumentSnapshot post = documentSnapshotList.get(0);
-                                String entry = post.get("moodEntry").toString();
-                                String rating = post.get("moodRating").toString();
-                                postMoodEntryDisplay.setText(entry);
-                                postMoodRatingDisplay.setText("Mood Rating: " + rating);
+                            for (QueryDocumentSnapshot post : task.getResult()) {
+                                usernamesView.add("tempusername");
+                                System.out.println("updateDisplay: " + post.get("moodEntry").toString());
+                                moodEntryView.add(post.get("moodEntry").toString());
+                                moodRatingView.add(post.get("moodRating").toString());
                             }
+                            postAdapter.notifyDataSetChanged();
                         }
                     }
                 });

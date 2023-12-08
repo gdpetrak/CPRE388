@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--Individual Post Display-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:background="@color/primary_200">
+    <TextView
+        android:id="@+id/post_username_display"
+        android:text="@string/temp_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="15dp" />
+
+    <TextView
+        android:id="@+id/post_mood_entry_display"
+        android:text="@string/temp_text_here_ni_was_feeling_really_sad_nso_sad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginBottom="15dp"/>
+
+    <TextView
+        android:id="@+id/post_mood_rating_display"
+        android:text="@string/mood_rating"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginBottom="15dp"/>
+
+</LinearLayout>
