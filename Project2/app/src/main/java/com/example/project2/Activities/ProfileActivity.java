@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.project2.R;
+import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,8 +44,6 @@ public class ProfileActivity extends AppCompatActivity {
             "If you can dream it, you can do it."};
 
     GraphView graphView;
-    private static final String POST_COLLECTION_LOCATION = "moodPosts";
-    private static final String USER_COLLECTION_LOCATION = "users";
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
     private CollectionReference usersCollection;
@@ -64,8 +63,8 @@ public class ProfileActivity extends AppCompatActivity {
         FirebaseFirestore.setLoggingEnabled(true);
         mFirestore = FirebaseUtil.getFirestore();
 
-        moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
-        usersCollection = mFirestore.collection(USER_COLLECTION_LOCATION);
+        moodPostsCollection = mFirestore.collection(Collections.POST_COLLECTION_LOCATION);
+        usersCollection = mFirestore.collection(Collections.USER_COLLECTION_LOCATION);
 
         // Init layout references
         Button backButton = findViewById(R.id.back_button);

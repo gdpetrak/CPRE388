@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.project2.Database.User;
 import com.example.project2.R;
+import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -35,7 +36,6 @@ import com.google.firebase.firestore.Transaction;
 import java.util.List;
 
 public class ProfileSettingsActivity extends AppCompatActivity {
-    private static final String USER_COLLECTION_LOCATION = "users";
     private CollectionReference usersCollection;
     private FirebaseFirestore mFirestore;
     private FirebaseUser user;
@@ -49,7 +49,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
         FirebaseFirestore.setLoggingEnabled(true);
         mFirestore = FirebaseUtil.getFirestore();
-        usersCollection = mFirestore.collection(USER_COLLECTION_LOCATION);
+        usersCollection = mFirestore.collection(Collections.USER_COLLECTION_LOCATION);
 
         // Init alert builder
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);

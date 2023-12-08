@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.project2.Database.User;
 import com.example.project2.R;
+import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,7 +28,6 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RegisterActivity extends AppCompatActivity {
-    private static final String USERNAME_COLLECTION = "users";
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFirestore;
     @Override
@@ -73,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     Log.d(TAG, "createUserWithEmail:success");
 
                                     // Create username userid combo
-                                    CollectionReference usernameReference = mFirestore.collection(USERNAME_COLLECTION);
+                                    CollectionReference usernameReference = mFirestore.collection(Collections.USER_COLLECTION_LOCATION);
                                     User currentUser = new User(usernameInput.getText().toString(), mAuth.getUid());
                                     usernameReference.add(currentUser).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                         @Override

@@ -32,7 +32,7 @@ public class IndividualPostAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return moodEntry.size();
+        return usernames.size();
     }
 
     @Override

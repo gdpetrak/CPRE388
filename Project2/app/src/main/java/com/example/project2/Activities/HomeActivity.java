@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
+import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
 import com.example.project2.util.IndividualPostAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,9 +38,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
-    private static final String USERNAME_COLLECTION = "users";
-    private static final String POST_COLLECTION_LOCATION = "moodPosts";
-    private static final String USER_COLLECTION_LOCATION = "users";
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
     Timestamp[] timestamps = new Timestamp[3];
@@ -82,8 +80,8 @@ public class HomeActivity extends AppCompatActivity {
         // Init firebase
         FirebaseFirestore.setLoggingEnabled(true);
         mFirestore = FirebaseUtil.getFirestore();
-        moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
-        usersCollection = mFirestore.collection(USER_COLLECTION_LOCATION);
+        moodPostsCollection = mFirestore.collection(Collections.POST_COLLECTION_LOCATION);
+        usersCollection = mFirestore.collection(Collections.USER_COLLECTION_LOCATION);
 
         // Init user
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
@@ -163,10 +161,23 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            List<DocumentSnapshot> documentSnapshotList = task.getResult().getDocuments();
                             for (QueryDocumentSnapshot post : task.getResult()) {
-                                usernamesView.add("tempusername");
-                                System.out.println("updateDisplay: " + post.get("moodEntry").toString());
+                                usersCollection.whereEqualTo("uid", post.get("posterId").toString()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            List<DocumentSnapshot> documentSnapshotList = task.getResult().getDocuments();
+                                            if (documentSnapshotList.size() > 0) {
+                                                usernamesView.add(documentSnapshotList.get(0).get("username").toString());
+                                            } else {
+                                                usernamesView.add("Deleted User");
+                                            }
+                                        } else {
+                                            usernamesView.add("Deleted User");
+                                        }
+                                        postAdapter.notifyDataSetChanged();
+                                    }
+                                });
                                 moodEntryView.add(post.get("moodEntry").toString());
                                 moodRatingView.add(post.get("moodRating").toString());
                             }
