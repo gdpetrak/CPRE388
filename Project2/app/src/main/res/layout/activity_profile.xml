@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/username_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/profile_page"
@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:text="@string/home"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/textView"
+            app:layout_constraintEnd_toStartOf="@+id/username_display"
             app:layout_constraintHorizontal_bias="0.1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,21 +50,19 @@
         android:layout_width="350dp"
         android:layout_height="300dp"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toTopOf="@+id/accountManagement"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.508"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintVertical_bias="0.48000002" />
 
     <LinearLayout
+        android:id="@+id/accountManagement"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/accountManagement"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/idGraphView">
 
@@ -87,28 +85,17 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/quoteText"
-        android:layout_width="349dp"
-        android:layout_height="46dp"
-        android:text="@string/mq1"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/accountManagement"
+        android:id="@+id/motivation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:paddingHorizontal="15dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/idGraphView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/idGraphView"
-        app:layout_constraintVertical_bias="0.837" />
-
-    <TextView
-        android:id="@+id/motivational"
-        android:layout_width="253dp"
-        android:layout_height="33dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/motivational"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/quoteText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+        app:layout_constraintVertical_bias="0.3" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

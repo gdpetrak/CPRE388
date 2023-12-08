@@ -2,6 +2,8 @@ package com.example.project2.Activities;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +37,15 @@ public class SignInActivity extends AppCompatActivity {
         // Firebase stuff
         mAuth = FirebaseUtil.getAuth();
 
+        // Sign in failed alert
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,7 +66,8 @@ public class SignInActivity extends AppCompatActivity {
                                     startActivity(new Intent(SignInActivity.this, HomeActivity.class));
                                 } else {
                                     Log.d(TAG, "signInWithEmail:failure", task.getException());
-                                    // TODO make a pop up here telling user why it failed.
+                                    alertBuilder.setMessage("Failed to sign in with email\n" + task.getException());
+                                    alertBuilder.show();
                                 }
                             }
                         });

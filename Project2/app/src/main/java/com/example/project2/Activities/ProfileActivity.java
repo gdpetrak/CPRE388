@@ -4,6 +4,9 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,27 +38,39 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
-public class ProfileActivity extends AppCompatActivity{
+public class ProfileActivity extends AppCompatActivity {
+
+    String[] quotes = {"It does not matter how slowly you go as long as you do not stop.",
+            "Quality is not an act, it is a habit.",
+            "Life is 10% what happens to you and 90% how you react to it.",
+            "It always seems impossible until it's done.",
+            "Good, better, best. Never let it rest. 'Til your good is better and your better is best.",
+            "With the new day comes new strength and new thoughts.",
+            "When something is important enough, you do it even if the odds are not in your favor.",
+            "Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.",
+            "Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.",
+            "If you can dream it, you can do it."};
+
     GraphView graphView;
     private static final String POST_COLLECTION_LOCATION = "moodPosts";
-    private static final String POST_TIME_FIELD = "postTime";
+    private static final String USER_COLLECTION_LOCATION = "users";
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
-    Timestamp[] timestamps = new Timestamp[5];
+    private CollectionReference usersCollection;
+    int[] userX = new int[5];
     int[] userY = new int[5];
     int i = 4;
+    Timestamp[] timestamps = new Timestamp[5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Init firebase
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
 
@@ -66,36 +81,86 @@ public class ProfileActivity extends AppCompatActivity{
         }
 
         moodPostsCollection = mFirestore.collection(POST_COLLECTION_LOCATION);
+        usersCollection = mFirestore.collection(USER_COLLECTION_LOCATION);
 
+        // Init alert builder
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setMessage("Are you sure you want to delete your account?\n" +
+                "(Once an account is deleted, there is no way to recover it)")
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        assert user != null;
+                        user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "deleteAccount:success");
+                                    startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
+                                } else {
+                                    Log.d(TAG, "deleteAccount:failed ==> " + task.getException());
+                                }
+                            }
+                        });
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        Dialog deleteAccountAlert = alertBuilder.create();
+
+        // Init layout references
         Button backButton = findViewById(R.id.back_button);
         Button signOutButton = findViewById(R.id.sign_out);
         Button deleteAccountButton = findViewById(R.id.delete_account);
+        TextView motivationalQuotes = findViewById(R.id.motivation);
+        TextView usernameDisplay = findViewById(R.id.username_display);
 
-        TextView motivation = findViewById(R.id.quoteText);
-        Random rand = new Random();
-        int randNum = rand.nextInt();
-        if ((randNum % 10) == 0) {
-            motivation.setText(R.string.mq1);
-        } else if ((randNum % 10) == 1) {
-            motivation.setText(R.string.mq2);
-        } else if ((randNum % 10) == 2) {
-            motivation.setText(R.string.mq3);
-        } else if ((randNum % 10) == 3) {
-            motivation.setText(R.string.mq4);
-        } else if ((randNum % 10) == 4) {
-            motivation.setText(R.string.mq5);
-        } else if ((randNum % 10) == 5) {
-            motivation.setText(R.string.mq6);
-        } else if ((randNum % 10) == 6) {
-            motivation.setText(R.string.mq7);
-        } else if ((randNum % 10) == 7) {
-            motivation.setText(R.string.mq8);
-        } else if ((randNum % 10) == 8) {
-            motivation.setText(R.string.mq9);
-        } else if ((randNum % 10) == 9) {
-            motivation.setText(R.string.mq10);
-        }
+        // Init username display
+        usersCollection.whereEqualTo("uid", user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot documentSnapshot = task.getResult();
+                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                            if (documentSnapshotList.size() > 0) {
+                                usernameDisplay.setText(documentSnapshotList.get(0).get("username").toString());
+                            }
+                        }
+                    }
+                });
 
+        // Init button on click actions
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
+            }
+        });
+
+        signOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.signOut();
+                startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
+            }
+        });
+
+        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteAccountAlert.show();
+            }
+        });
+
+        // Set up the quotes
+        Random r = new Random();
+        motivationalQuotes.setText(quotes[r.nextInt(quotes.length)]);
+
+        // Render the graphs
         moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -151,39 +216,6 @@ public class ProfileActivity extends AppCompatActivity{
                     // data series to our graph view.
                     graphView.addSeries(series);
                 }
-            }
-        });
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
-            }
-        });
-
-        signOutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signOut();
-                startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
-            }
-        });
-
-        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                assert user != null;
-                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "deleteAccount:success");
-                            startActivity(new Intent(ProfileActivity.this, LandingActivity.class));
-                        } else {
-                            Log.d(TAG, "deleteAccount:failed ==> " + task.getException());
-                        }
-                    }
-                });
             }
         });
     }
