@@ -86,7 +86,7 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         userInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         alertBuilder.setView(userInput);
         alertBuilder.setMessage("Please enter a new username.")
-                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Change Username", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         updateUsernameButton(userInput.getText().toString(), mFirestore);

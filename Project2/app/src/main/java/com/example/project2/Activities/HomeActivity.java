@@ -24,9 +24,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
     private static final String USERNAME_COLLECTION = "users";
@@ -122,68 +124,41 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
-
-//        TextView recentPost1 = findViewById(R.id.post1);
-//        TextView recentPost2 = findViewById(R.id.post2);
-//        TextView recentPost3 = findViewById(R.id.post3);
-//
-//        moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    for (QueryDocumentSnapshot document : task.getResult()) {
-//                        if (document.getString("posterId").equals(user.getUid())) {
-//                            i = 2;
-//                            while (i > 0) {
-//                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
-//                                    shiftTimestamps(i, document.get("postTime", Timestamp.class));
-//                                    rating[i] = document.getLong("moodRating").intValue();
-//                                    moodEntry[i] = document.getString("moodEntry");
-//                                    i = -1;
-//                                } else {
-//                                    i--;
-//                                }
-//                            }
-//                            if (i == 0) {
-//                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
-//                                    timestamps[i] = document.get("postTime", Timestamp.class);
-//                                    rating[i] = document.getLong("moodRating").intValue();
-//                                    moodEntry[i] = document.getString("moodEntry");
-//                                }
-//                            }
-//                        }
-//                    }
-//                    if(moodEntry[0].isEmpty()){
-//                        recentPost3.setText("Make a Mood Entry to see it appear here!");
-//                    }else{
-//                        recentPost3.setText("Date posted: " + timestamps[0].toDate() + '\n' + '\n' + "Your mood entry: " + moodEntry[0]+ '\n' + '\n' +"Your mood rating: " + rating[0]);
-//
-//                    }
-//                    if(moodEntry[1].isEmpty()){
-//                        recentPost2.setText("Make a mood entry to see it appear here!");
-//                    }else{
-//                        recentPost2.setText("Date posted: " + timestamps[1].toDate() + '\n' + '\n' +"Your mood entry: " + moodEntry[1]+ '\n' + '\n' + "Your mood rating: " + rating[1]);
-//
-//                    }
-//                    if (moodEntry[2].isEmpty()){
-//                        recentPost1.setText("Make a mood entry to see it appear here!");
-//                    }else {
-//                        recentPost1.setText("Date posted: " + timestamps[2].toDate() + '\n' + '\n' + "Your mood entry: " + moodEntry[2]+ '\n' + '\n' + "Your mood rating: " + rating[2]);
-//                    }
-//                }
-//            }
-//
-//        });
-
+        updatePostDisplay();
     }
 
     private void createPost(String posterId, String moodEntry, int moodRating) {
         MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
         moodPostsCollection.add(post);
+        updatePostDisplay();
     }
 
     private void createPost(MoodPost post) {
         moodPostsCollection.add(post);
+        updatePostDisplay();
+    }
+
+    private void updatePostDisplay() {
+        // DISPLAY POST CODE
+        TextView postUsernameDisplay = findViewById(R.id.post_username_display);
+        TextView postMoodEntryDisplay = findViewById(R.id.post_mood_entry_display);
+        TextView postMoodRatingDisplay = findViewById(R.id.post_mood_rating_display);
+
+        moodPostsCollection.orderBy("postTime", Query.Direction.DESCENDING).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot documentSnapshot = task.getResult();
+                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                            if (documentSnapshotList.size() > 0) {
+                                DocumentSnapshot post = documentSnapshotList.get(0);
+                                postMoodEntryDisplay.setText(Objects.requireNonNull(post.get("moodEntry")).toString());
+                                postMoodRatingDisplay.setText("Mood Rating: " +
+                                        Objects.requireNonNull(post.get("moodRating")).toString());
+                            }
+                        }
+                    }
+                });
     }
 }
