@@ -111,17 +111,12 @@ public class HomeActivity extends AppCompatActivity {
         postCreatedPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int postId = -1; // TODO get post id from server (ideally just make it count up)
-                String posterId = user.getUid();
-                String moodEntry = createPostEntryInput.getText().toString();
-                int moodRating = (int) createPostMoodInput.getValue();
-                MoodPost post = new MoodPost(postId, posterId, moodEntry, moodRating);
+                // Create the post
+                createPost(user.getUid(), createPostEntryInput.getText().toString(),
+                        (int) createPostMoodInput.getValue());
 
-                // Reset the edit text
+                // Hide popup and reset text
                 createPostEntryInput.setText("");
-
-                // Send post to database and hide popup
-                moodPostsCollection.add(post);
                 createPostPopup.setVisibility(View.GONE);
             }
         });
@@ -189,6 +184,16 @@ public class HomeActivity extends AppCompatActivity {
 //        });
 
     }
+
+    private void createPost(String posterId, String moodEntry, int moodRating) {
+        MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
+        moodPostsCollection.add(post);
+    }
+
+    private void createPost(MoodPost post) {
+        moodPostsCollection.add(post);
+    }
+
     private void shiftTimestamps ( int i, Timestamp postTime){
         for (int j = 0; j < i; j++) {
             timestamps[j] = timestamps[j + 1];

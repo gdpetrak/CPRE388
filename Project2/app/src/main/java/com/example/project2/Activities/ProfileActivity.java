@@ -161,70 +161,58 @@ public class ProfileActivity extends AppCompatActivity {
         motivationalQuotes.setText(quotes[r.nextInt(quotes.length)]);
 
         // Render the graphs
-        moodPostsCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        if (document.getString("posterId").equals(user.getUid())) {
-                            i = 4;
-                            while (i > 0) {
-                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
-                                    shiftTimestamps(i, document.get("postTime", Timestamp.class));
-                                    userY[i] = document.getLong("moodRating").intValue();
-                                    i = -1;
-                                } else {
-                                    i--;
-                                }
+        System.out.println("moodpostretrieval: task starting");
+        moodPostsCollection.whereEqualTo("posterId", user.getUid())
+                .orderBy("postTime", Query.Direction.DESCENDING)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        System.out.println("moodpostretrieval: task complete");
+                        if (task.isSuccessful()) {
+                            System.out.println("moodpostretrieval: task successful");
+                            int i = 4;
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                System.out.println("DOCUMENT" + document.getLong("moodRating").toString());
+                                if (i < 0)
+                                    break;
+
+                                userY[i] = document.getLong("moodRating").intValue();
+                                i--;
                             }
-                            if (i == 0) {
-                                if (document.get("postTime", Timestamp.class).compareTo(timestamps[i]) > 0) {
-                                    timestamps[i] = document.get("postTime", Timestamp.class);
-                                    userY[i] = document.getLong("moodRating").intValue();
-                                }
-                            }
+
+                            // on below line we are initializing our graph view.
+                            graphView = findViewById(R.id.idGraphView);
+                            LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
+                                    // on below line we are adding
+                                    // each point on our x and y axis.
+                                    new DataPoint(1, userY[0]),
+                                    new DataPoint(2, userY[1]),
+                                    new DataPoint(3, userY[2]),
+                                    new DataPoint(4, userY[3]),
+                                    new DataPoint(5, userY[4])
+                            });
+
+                            // after adding data to our line graph series.
+                            // on below line we are setting
+                            // title for our graph view.
+                            graphView.setTitle("Mood Trend");
+
+                            // on below line we are setting
+                            // text color to our graph view.
+                            graphView.setTitleColor(R.color.black);
+
+                            // on below line we are setting
+                            // our title text size.
+                            graphView.setTitleTextSize(45);
+
+                            // on below line we are adding
+                            // data series to our graph view.
+                            graphView.addSeries(series);
+                        } else {
+                            System.out.println("moodpostretrieval: task failed");
+                            System.out.println("moodpostretrieval: " + task.getException());
                         }
                     }
-                    // on below line we are initializing our graph view.
-                    graphView = findViewById(R.id.idGraphView);
-                    LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[]{
-                            // on below line we are adding
-                            // each point on our x and y axis.
-                            new DataPoint(1, 1),
-                            new DataPoint(1, 5),
-                            new DataPoint(1, userY[0]),
-                            new DataPoint(2, userY[1]),
-                            new DataPoint(3, userY[2]),
-                            new DataPoint(4, userY[3]),
-                            new DataPoint(5, userY[4])
-                    });
-
-                    // after adding data to our line graph series.
-                    // on below line we are setting
-                    // title for our graph view.
-                    graphView.setTitle("Mood Trend");
-
-                    // on below line we are setting
-                    // text color to our graph view.
-                    graphView.setTitleColor(R.color.black);
-
-                    // on below line we are setting
-                    // our title text size.
-                    graphView.setTitleTextSize(45);
-
-                    // on below line we are adding
-                    // data series to our graph view.
-                    graphView.addSeries(series);
-                }
-            }
-        });
-    }
-
-    private void shiftTimestamps(int i, Timestamp postTime) {
-        for (int j = 0; j < i; j++) {
-            timestamps[j] = timestamps[j+1];
-            userY[j] = userY[j+1];
-        }
-        timestamps[i] = postTime;
+                });
     }
 }
