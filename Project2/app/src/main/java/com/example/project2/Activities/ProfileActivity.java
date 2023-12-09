@@ -15,11 +15,13 @@ import com.example.project2.R;
 import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
 import com.example.project2.util.IndividualPostAdapter;
+import com.example.project2.util.UserPostAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -55,10 +57,11 @@ public class ProfileActivity extends AppCompatActivity {
     int[] userY = new int[5];
     int i = 4;
 
-    IndividualPostAdapter postAdapter;
+    UserPostAdapter postAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
     ArrayList<String> moodEntryView = new ArrayList<>();
     ArrayList<String> moodRatingView = new ArrayList<>();
+    ArrayList<String> postRef = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +86,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Post list init
         ListView listView = (ListView) findViewById(R.id.post_list);
-        postAdapter = new IndividualPostAdapter(getApplicationContext(), usernamesView, moodEntryView, moodRatingView);
+        postAdapter = new UserPostAdapter(getApplicationContext(), usernamesView, moodEntryView,
+                moodRatingView, postRef, moodPostsCollection);
         listView.setAdapter(postAdapter);
 
         String uid = user.getUid();
@@ -125,7 +129,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Render the graphs
         System.out.println("moodpostretrieval: task starting");
         moodPostsCollection.whereEqualTo("posterId", user.getUid())
-                .orderBy("postTime", Query.Direction.DESCENDING)
+                .orderBy("postTime", Query.Direction.DESCENDING).limit(5)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -208,6 +212,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
                                 moodRatingView.add(post.get("moodRating").toString());
+                                postRef.add(post.getId());
                             }
                             postAdapter.notifyDataSetChanged();
                         }

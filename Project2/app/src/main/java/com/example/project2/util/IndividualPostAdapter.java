@@ -16,6 +16,7 @@ public class IndividualPostAdapter extends BaseAdapter {
     // Variables needed to generate the listview
     Context context;
     LayoutInflater inflater;
+    int inflatableLayout;
 
     // Data to display in the listview
     ArrayList<String> usernames;
@@ -27,6 +28,7 @@ public class IndividualPostAdapter extends BaseAdapter {
         this.usernames = usernames;
         this.moodEntry = moodEntry;
         this.moodRating = moodRating;
+        this.inflatableLayout = R.layout.activity_individualpost;
         inflater = (LayoutInflater.from(applicationContext));
     }
 
@@ -47,7 +49,7 @@ public class IndividualPostAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        view = inflater.inflate(R.layout.activity_individualpost, null);
+        view = inflater.inflate(inflatableLayout, null);
         TextView usernameDisplay = view.findViewById(R.id.post_username_display);
         TextView entryDisplay = view.findViewById(R.id.post_mood_entry_display);
         TextView ratingDisplay = view.findViewById(R.id.post_mood_rating_display);

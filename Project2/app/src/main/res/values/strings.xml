@@ -37,4 +37,5 @@
     <string name="temp_username">Temp Username</string>
     <string name="mood_rating">Mood Rating:</string>
     <string name="temp_text_here_ni_was_feeling_really_sad_nso_sad">Temp text here\nI was feeling really sad.\nSo sad.</string>
+    <string name="delete">Delete</string>
 </resources>
