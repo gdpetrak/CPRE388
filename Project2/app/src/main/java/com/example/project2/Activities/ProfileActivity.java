@@ -8,11 +8,13 @@ import android.os.Bundle;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.project2.R;
 import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
+import com.example.project2.util.IndividualPostAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,10 +25,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.User;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -51,6 +55,11 @@ public class ProfileActivity extends AppCompatActivity {
     int[] userY = new int[5];
     int i = 4;
 
+    IndividualPostAdapter postAdapter;
+    ArrayList<String> usernamesView = new ArrayList<>();
+    ArrayList<String> moodEntryView = new ArrayList<>();
+    ArrayList<String> moodRatingView = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +81,15 @@ public class ProfileActivity extends AppCompatActivity {
         TextView motivationalQuotes = findViewById(R.id.motivation);
         TextView usernameDisplay = findViewById(R.id.username_display);
 
+        // Post list init
+        ListView listView = (ListView) findViewById(R.id.post_list);
+        postAdapter = new IndividualPostAdapter(getApplicationContext(), usernamesView, moodEntryView, moodRatingView);
+        listView.setAdapter(postAdapter);
+
+        String uid = user.getUid();
+
         // Init username display
-        usersCollection.whereEqualTo("uid", user.getUid()).get()
+        usersCollection.whereEqualTo("uid", uid).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -156,6 +172,40 @@ public class ProfileActivity extends AppCompatActivity {
                         } else {
                             System.out.println("moodpostretrieval: task failed");
                             System.out.println("moodpostretrieval: " + task.getException());
+                        }
+                    }
+                });
+
+        updatePostDisplay(uid);
+    }
+
+    private void updatePostDisplay(String uid) {
+        moodPostsCollection.whereEqualTo("posterId", uid).orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot post : task.getResult()) {
+                                usersCollection.whereEqualTo("uid", post.get("posterId").toString()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            List<DocumentSnapshot> documentSnapshotList = task.getResult().getDocuments();
+                                            if (documentSnapshotList.size() > 0) {
+                                                usernamesView.add(documentSnapshotList.get(0).get("username").toString());
+                                            } else {
+                                                usernamesView.add("Deleted User");
+                                            }
+                                        } else {
+                                            usernamesView.add("Deleted User");
+                                        }
+                                        postAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                                moodEntryView.add(post.get("moodEntry").toString());
+                                moodRatingView.add(post.get("moodRating").toString());
+                            }
+                            postAdapter.notifyDataSetChanged();
                         }
                     }
                 });

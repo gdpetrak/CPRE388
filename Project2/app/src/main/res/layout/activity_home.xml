@@ -50,7 +50,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--Individual Post Display-->
+        <!--Post Display-->
         <ListView
             android:id="@+id/post_list"
             android:layout_width="match_parent"
@@ -84,77 +84,85 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.8">
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                card_view:cardBackgroundColor="@color/primary_400"
+                card_view:cardCornerRadius="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/primary_200"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10sp"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10sp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.7"
+                            android:id="@+id/username_display"
+                            android:text="@string/username" />
+
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.3"
+                            android:id="@+id/close_create_post"
+                            android:text="@string/close"
+                            android:theme="@style/Button.Default"
+                            android:backgroundTint="@color/primary_700"/>
+
+                    </LinearLayout>
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:id="@+id/mood_entry"
+                        android:gravity="start|top"
+                        android:inputType="textMultiLine"
+                        android:layout_marginHorizontal="10sp"/>
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.7"
-                        android:id="@+id/username_display"
-                        android:text="@string/username" />
+                        android:layout_marginHorizontal="10sp"
+                        android:text="Mood Rating"
+                        android:labelFor="@+id/mood_rating"
+                        android:layout_gravity="start"/>
+
+                    <com.google.android.material.slider.Slider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10sp"
+                        android:id="@+id/mood_rating"
+                        android:stepSize="1"
+                        android:value="3"
+                        android:valueFrom="1"
+                        android:valueTo="5"/>
 
                     <Button
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.3"
-                        android:id="@+id/close_create_post"
-                        android:text="@string/close"
-                        android:theme="@style/Button.Default"
+                        android:id="@+id/post"
+                        android:text="@string/post"
+                        android:layout_marginHorizontal="10sp"
+                        android:layout_gravity="end"
                         android:backgroundTint="@color/primary_700"/>
 
                 </LinearLayout>
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:id="@+id/mood_entry"
-                    android:gravity="start|top"
-                    android:inputType="textMultiLine"
-                    android:layout_marginHorizontal="10sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10sp"
-                    android:text="Mood Rating"
-                    android:labelFor="@+id/mood_rating"
-                    android:layout_gravity="start"/>
-
-                <com.google.android.material.slider.Slider
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10sp"
-                    android:id="@+id/mood_rating"
-                    android:stepSize="1"
-                    android:value="3"
-                    android:valueFrom="1"
-                    android:valueTo="5"/>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/post"
-                    android:text="@string/post"
-                    android:layout_marginHorizontal="10sp"
-                    android:layout_gravity="end"
-                    android:backgroundTint="@color/primary_700"/>
-
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </RelativeLayout>
 

@@ -82,4 +82,18 @@
         android:layout_marginTop="15dp"
         tools:layout_editor_absoluteY="161dp" />
 
+    <!--Post Display-->
+    <ListView
+        android:id="@+id/post_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:divider="@color/cardview_light_background"
+        android:dividerHeight="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/idGraphView"
+        app:layout_constraintVertical_bias="0.4"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
