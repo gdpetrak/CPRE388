@@ -169,6 +169,10 @@ public class ProfileActivity extends AppCompatActivity {
                             // on below line we are adding
                             // data series to our graph view.
                             graphView.addSeries(series);
+
+                            graphView.getViewport().setMinY(1);
+                            graphView.getViewport().setMaxY(5);
+                            graphView.getViewport().setYAxisBoundsManual(true);
                         } else {
                             System.out.println("moodpostretrieval: task failed");
                             System.out.println("moodpostretrieval: " + task.getException());
