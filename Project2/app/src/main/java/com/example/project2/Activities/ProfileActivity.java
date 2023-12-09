@@ -287,7 +287,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
                                     }
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
-                                moodRatingView.add(post.get("moodRating").toString());
+                                moodRatingView.add("Mood: " + post.get("moodRating").toString());
                                 postRef.add(post.getId());
                             }
                             postAdapter.notifyDataSetChanged();
