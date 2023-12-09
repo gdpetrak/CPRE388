@@ -210,7 +210,12 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
         Button editPostClose = findViewById(R.id.close_create_post);
         Button editPostFinish = findViewById(R.id.finish_edit_post);
 
-        // TODO fill the default entries with the old post text
+        // Fill the default entries with the old post text
+        int postIndex = postRef.indexOf(editPostId);
+        String defaultEntry = moodEntryView.get(postIndex);
+        Float defaultMood = Float.parseFloat(moodRatingView.get(postIndex));
+        editPostEntryInput.setText(defaultEntry);
+        editPostMoodInput.setValue(defaultMood);
 
         // Set the onClick functionality for when they finish editing a post
         editPostClose.setOnClickListener(new View.OnClickListener() {
@@ -232,12 +237,15 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
                 else
                     Log.w(TAG, "editPost:failure ==>", result.getException());
 
+                // Update Display
+                moodEntryView.set(postIndex, editPostEntryInput.getText().toString());
+                moodRatingView.set(postIndex, Integer.toString((int) editPostMoodInput.getValue()));
+                postAdapter.notifyDataSetChanged();
+
                 // Hide the popup and reset inputs
                 editPostPopup.setVisibility(View.GONE);
                 editPostEntryInput.setText("");
                 editPostMoodInput.setValue(3);
-
-                // TODO update display
             }
 
             private Task<Transaction> editPost(DocumentReference editRef, String entry, int mood) {
