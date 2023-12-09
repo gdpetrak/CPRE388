@@ -43,6 +43,9 @@ import java.util.Random;
  */
 public class ProfileActivity extends AppCompatActivity {
 
+    /**
+     * The list of possible motivational quotes that can be provided to users.
+     */
     String[] quotes = {"It does not matter how slowly you go as long as you do not stop.",
             "Quality is not an act, it is a habit.",
             "Life is 10% what happens to you and 90% how you react to it.",
@@ -53,19 +56,23 @@ public class ProfileActivity extends AppCompatActivity {
             "Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.",
             "Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.",
             "If you can dream it, you can do it."};
+
     /**
      * graphView will be the graph that is displayed showing the Mood trend of a user.
      */
     GraphView graphView;
+
     /**
      * mFirestore allows the app to communicate with the database and allow
      * transactions.
      */
     private FirebaseFirestore mFirestore;
+
     /**
      * moodPostsCollection reference to access the mood collection
      */
     private CollectionReference moodPostsCollection;
+
     /**
      * userCollection reference to access the user collection
      */
@@ -75,13 +82,31 @@ public class ProfileActivity extends AppCompatActivity {
      * Integer array that will hold the values of the latest mood ratings for the Mood trend graph.
      */
     int[] userY = new int[5];
-    int i = 4;
 
+    /**
+     * Adapter allowing us to access and list our data from Firebase.
+     */
     IndividualPostAdapter postAdapter;
+
+    /**
+     * An ArrayList of each of the usernames to be displayed for the posts.
+     */
     ArrayList<String> usernamesView = new ArrayList<>();
+
+    /**
+     * An ArrayList of each of the mood entries to be displayed for the posts.
+     */
     ArrayList<String> moodEntryView = new ArrayList<>();
+
+    /**
+     * An ArrayList of each of the mood ratings to be displayed for the posts.
+     */
     ArrayList<String> moodRatingView = new ArrayList<>();
 
+    /**
+     * Initializes the screen when the activity is called.
+     * @param savedInstanceState The previous state of the Activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +138,12 @@ public class ProfileActivity extends AppCompatActivity {
         // Init username display
         usersCollection.whereEqualTo("uid", uid).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                    /**
+                     * Grabs all data on the user's posts from our database so it can
+                     * be displayed once fetched.
+                     * @param task Current task that is being completed.
+                     */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -127,6 +158,11 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Init button on click actions
         backButton.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * Allows the user to go back to the HomeActivity screen.
+             * @param view A reference to the button's view.
+             */
             @Override
             public void onClick(View view) {
                 finish();
@@ -134,6 +170,11 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         settingsButton.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * Allows the user to change their profile settings in a new Activity.
+             * @param view A reference to the button's view.
+             */
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(ProfileActivity.this, ProfileSettingsActivity.class));
@@ -149,6 +190,12 @@ public class ProfileActivity extends AppCompatActivity {
         moodPostsCollection.whereEqualTo("posterId", user.getUid())
                 .orderBy("postTime", Query.Direction.DESCENDING)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                    /**
+                     * Obtains the user's last five mood posts and displays their ratings
+                     * on a graph.
+                     * @param task The task that is being completed.
+                     */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         System.out.println("moodpostretrieval: task complete");
@@ -205,14 +252,28 @@ public class ProfileActivity extends AppCompatActivity {
         updatePostDisplay(uid);
     }
 
+    /**
+     * The method that updates the ListView based on the amount of info gathered from Firebase.
+     * @param uid The current user's ID.
+     */
     private void updatePostDisplay(String uid) {
         moodPostsCollection.whereEqualTo("posterId", uid).orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                    /**
+                     * Grabs all required posts from our database so it can be displayed once fetched.
+                     * @param task Current task that is being completed.
+                     */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot post : task.getResult()) {
                                 usersCollection.whereEqualTo("uid", post.get("posterId").toString()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                                    /**
+                                     * Grabs all required data of the posts from our database so it can be displayed once fetched.
+                                     * @param task Current task that is being completed.
+                                     */
                                     @Override
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         if (task.isSuccessful()) {

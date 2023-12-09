@@ -37,29 +37,56 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * This is screen is where users will be sent when successfully logged in.
+ * They can view other's mood posts and create one themselves.
+ */
 public class HomeActivity extends AppCompatActivity {
+
+    /**
+     * Reference to our Firebase.
+     */
     private FirebaseFirestore mFirestore;
+
+    /**
+     * Reference to the collection 'moodPosts'.
+     */
     private CollectionReference moodPostsCollection;
-    Timestamp[] timestamps = new Timestamp[3];
-    private int i;
-    private int[] rating = new int[3];
-    private String[] moodEntry = new String[3];
+
+    /**
+     * Reference to the collection 'users'.
+     */
     private CollectionReference usersCollection;
 
+    /**
+     * Adapter allowing us to access and list our data from Firebase.
+     */
     IndividualPostAdapter postAdapter;
+
+    /**
+     * An ArrayList of each of the usernames to be displayed for the posts.
+     */
     ArrayList<String> usernamesView = new ArrayList<>();
+
+    /**
+     * An ArrayList of each of the mood entries to be displayed for the posts.
+     */
     ArrayList<String> moodEntryView = new ArrayList<>();
+
+    /**
+     * An ArrayList of each of the mood ratings to be displayed for the posts.
+     */
     ArrayList<String> moodRatingView = new ArrayList<>();
 
+    /**
+     * Initializes the screen when the activity is called.
+     * @param savedInstanceState The previous state of the Activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        for (int j = 0; j < 3; j++) {
-            timestamps[j] = new Timestamp(0, 0);
-
-        }
         // Layout reference init
         Button closeCreatePostPopupButton = findViewById(R.id.close_create_post);
         Button postCreatedPost = findViewById(R.id.post);
@@ -90,6 +117,11 @@ public class HomeActivity extends AppCompatActivity {
         // Init username display
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                    /**
+                     * Grabs all required data from our database so it can be displayed once fetched.
+                     * @param task Current task that is being completed.
+                     */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -104,6 +136,10 @@ public class HomeActivity extends AppCompatActivity {
 
         // CREATE POST CODE
         createPostButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * A button that creates a popup allowing users to create a new post.
+             * @param v A reference to the button's view.
+             */
             @Override
             public void onClick(View v) {
                 createPostPopup.setVisibility(View.VISIBLE);
@@ -111,6 +147,10 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         closeCreatePostPopupButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * A button that closes/cancels the current mood post creation.
+             * @param v A reference to the button's view.
+             */
             @Override
             public void onClick(View v) {
                 createPostPopup.setVisibility(View.GONE);
@@ -118,6 +158,10 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         postCreatedPost.setOnClickListener(new View.OnClickListener() {
+            /**
+             * A button that submits a mood post to Firebase when completed.
+             * @param v A reference to the button's view.
+             */
             @Override
             public void onClick(View v) {
                 // Create the post
@@ -132,6 +176,10 @@ public class HomeActivity extends AppCompatActivity {
 
         // ACCOUNT CODE
         accountButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * A button that allows the user to switch to a View of their profile.
+             * @param view A reference to the button's view.
+             */
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
@@ -141,6 +189,12 @@ public class HomeActivity extends AppCompatActivity {
         updatePostDisplay();
     }
 
+    /**
+     * A function that initializes the space for a new entry on the screen.
+     * @param posterId The username of the user.
+     * @param moodEntry The description of their mood.
+     * @param moodRating The rating of their mood.
+     */
     private void createPost(String posterId, String moodEntry, int moodRating) {
         MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
         moodPostsCollection.add(post);
@@ -150,19 +204,33 @@ public class HomeActivity extends AppCompatActivity {
         updatePostDisplay();
     }
 
-    private void createPost(MoodPost post) {
+    // Currently no usages
+/*    private void createPost(MoodPost post) {
         moodPostsCollection.add(post);
         updatePostDisplay();
-    }
+    }*/
 
+    /**
+     * The method that updates the ListView based on the amount of info gathered from Firebase.
+     */
     private void updatePostDisplay() {
         moodPostsCollection.orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                    /**
+                     * Grabs all required posts from our database so it can be displayed once fetched.
+                     * @param task Current task that is being completed.
+                     */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot post : task.getResult()) {
                                 usersCollection.whereEqualTo("uid", post.get("posterId").toString()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                                    /**
+                                     * Grabs all required data of the posts from our database so it can be displayed once fetched.
+                                     * @param task Current task that is being completed.
+                                     */
                                     @Override
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         if (task.isSuccessful()) {

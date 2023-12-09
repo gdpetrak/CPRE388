@@ -22,8 +22,20 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * This activity allows users to sign in to the app.
+ */
 public class SignInActivity extends AppCompatActivity {
+
+    /**
+     * Stores the authentication value of the user.
+     */
     private FirebaseAuth mAuth;
+
+    /**
+     * Initializes the screen when the activity is called.
+     * @param savedInstanceState The previous state of the Activity.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,13 +52,24 @@ public class SignInActivity extends AppCompatActivity {
         // Sign in failed alert
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
+
+            /**
+             * Handles possible errors in the registration.
+             * @param dialogInterface This is tied to the listener.
+             * @param i
+             */
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
 
         signin.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * Handles logic for the Firebase when the Sign In button is pressed.
+             * @param v A reference to the button's view.
+             */
             @Override
             public void onClick(View v) {
                 // Check if email or password are invalid
@@ -59,6 +82,11 @@ public class SignInActivity extends AppCompatActivity {
                 // Create user account
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+
+                            /**
+                             * Assigns values and updates user data into the app.
+                             * @param task The task that is being completed.
+                             */
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {

@@ -13,8 +13,20 @@ import com.example.project2.util.FirebaseUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * This activity is the home page for users that are currently not signed in.
+ */
 public class LandingActivity extends AppCompatActivity {
+
+    /**
+     * Stores the authentication value of the user.
+     */
     private FirebaseAuth mAuth;
+
+    /**
+     * Initializes the screen when the activity is called.
+     * @param savedInstanceState The previous state of the Activity.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +40,11 @@ public class LandingActivity extends AppCompatActivity {
         mAuth = FirebaseUtil.getAuth();
 
         signin.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * A button that allows the user to switch to a View that allows them to sign in.
+             * @param v A reference to the button's view.
+             */
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LandingActivity.this, SignInActivity.class));
@@ -35,6 +52,11 @@ public class LandingActivity extends AppCompatActivity {
         });
 
         register.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * A button that allows the user to switch to a View that allows them to register.
+             * @param v A reference to the button's view.
+             */
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LandingActivity.this, RegisterActivity.class));
@@ -42,6 +64,9 @@ public class LandingActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method that checks if the user has already been signed in. If they are, send them to HomeActivity.
+     */
     @Override
     public void onStart() {
         super.onStart();
