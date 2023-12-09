@@ -1,32 +1,43 @@
 package com.example.project2.Activities;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
 import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
 import com.example.project2.util.IndividualPostAdapter;
 import com.example.project2.util.UserPostAdapter;
+import com.example.project2.util.UserPostAdapterDelegate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.slider.Slider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Transaction;
 import com.google.firebase.firestore.auth.User;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -36,7 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements UserPostAdapterDelegate {
 
     String[] quotes = {"It does not matter how slowly you go as long as you do not stop.",
             "Quality is not an act, it is a habit.",
@@ -87,7 +98,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Post list init
         ListView listView = (ListView) findViewById(R.id.post_list);
         postAdapter = new UserPostAdapter(getApplicationContext(), usernamesView, moodEntryView,
-                moodRatingView, postRef, moodPostsCollection);
+                moodRatingView, postRef, moodPostsCollection, this);
         listView.setAdapter(postAdapter);
 
         String uid = user.getUid();
@@ -185,6 +196,63 @@ public class ProfileActivity extends AppCompatActivity {
                 });
 
         updatePostDisplay(uid);
+    }
+
+    @Override
+    public void onEditPost(String editPostId) {
+        // Set popup to be visible
+        LinearLayout editPostPopup = findViewById(R.id.create_post_popup);
+        editPostPopup.setVisibility(View.VISIBLE);
+
+        // Set up the inputs
+        EditText editPostEntryInput = ((EditText) findViewById(R.id.mood_entry));
+        Slider editPostMoodInput = findViewById(R.id.mood_rating);
+        Button editPostClose = findViewById(R.id.close_create_post);
+        Button editPostFinish = findViewById(R.id.finish_edit_post);
+
+        // TODO fill the default entries with the old post text
+
+        // Set the onClick functionality for when they finish editing a post
+        editPostClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editPostPopup.setVisibility(View.GONE);
+            }
+        });
+
+        editPostFinish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Task<Transaction> result = editPost(moodPostsCollection.document(editPostId),
+                        editPostEntryInput.getText().toString(), (int) editPostMoodInput.getValue());
+
+                // Unreliable, always says failure TODO get proper results from the transaction
+                if (result.isSuccessful())
+                    Log.d(TAG, "editPost:success");
+                else
+                    Log.w(TAG, "editPost:failure ==>", result.getException());
+
+                // Hide the popup and reset inputs
+                editPostPopup.setVisibility(View.GONE);
+                editPostEntryInput.setText("");
+                editPostMoodInput.setValue(3);
+
+                // TODO update display
+            }
+
+            private Task<Transaction> editPost(DocumentReference editRef, String entry, int mood) {
+                return mFirestore.runTransaction(new Transaction.Function<Transaction>() {
+                    @Nullable
+                    @Override
+                    public Transaction apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                        DocumentSnapshot currPost = transaction.get(editRef);
+                        MoodPost updatedMoodPost = new MoodPost(currPost.get("posterId").toString(),
+                                entry, mood);
+                        return transaction.set(moodPostsCollection.document(editPostId), updatedMoodPost);
+                    }
+                });
+            }
+        });
     }
 
     private void updatePostDisplay(String uid) {
