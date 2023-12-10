@@ -26,6 +26,7 @@ public class User {
         friends = new ArrayList<>();
     }
     public User(){
+            friends = new ArrayList<>();
 
     }
 
@@ -50,7 +51,7 @@ public class User {
         friends.add(friendUid);
     }
 
-    public void setUsername(String user){
+    public void setUsername(String username){
         this.username = username;
     }
     public void setUid(String uid){
@@ -59,4 +60,7 @@ public class User {
     public void setFriend(List<String> friends){
         this.friends = friends;
     }
+
+
+
 }

@@ -44,7 +44,7 @@ public class FriendViewActivity extends AppCompatActivity {
 
     private FirebaseFirestore mFirestore;
     private CollectionReference usersCollection;
-    private FirebaseUser user;
+
     FriendAdapter friendAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
 
@@ -82,9 +82,7 @@ public class FriendViewActivity extends AppCompatActivity {
                                 for (String friend:friends) {
                                     usernamesView.add(friend);
                                 }
-//                                for(int i=0; i<friends.size()-1; i++){
-//                                    usernamesView.add(friends.get(i));
-//                                }
+
                             }
 
                         }
@@ -100,15 +98,7 @@ public class FriendViewActivity extends AppCompatActivity {
         addFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               String friendUser = userText.getText().toString();
-
-
-//                QuerySnapshot documentSnapshot = task.getResult();
-//                List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
-//
-//                DocumentReference userRef = usersCollection
-//                        .document(documentSnapshotList.get(0).getId());
-
+                String friendUser = userText.getText().toString();
 
                 usersCollection.whereEqualTo("username", friendUser)
                         .get()
@@ -118,19 +108,14 @@ public class FriendViewActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     QuerySnapshot querySnapshot = task.getResult();
                                     if (querySnapshot != null && !querySnapshot.isEmpty()) {
-                                        // User with the entered username found
                                         DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
                                         String friendUid = userDoc.getString("uid");
 
-                                        // Now you have the friend's UID, proceed to add the friend
                                         addFriendButton(friendUid, mFirestore);
                                     } else {
-                                        // User with the entered username not found
-                                        // Handle this case, e.g., show a message to the user
                                         Toast.makeText(FriendViewActivity.this, "User not found", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
-                                    // Handle the error
                                     Log.e(TAG, "Error searching for user", task.getException());
                                 }
                             }
@@ -149,11 +134,40 @@ public class FriendViewActivity extends AppCompatActivity {
                 String uid = currUserDoc.get("uid").toString();
                 List<String> friends = (List<String>) currUserDoc.get("friends");
 
+                // Assuming User class has a method like addFriend
                 User currentUser = new User(username, uid);
                 for (String friend : friends) {
-                    currentUser.addFriend(friend);
+                  //  currentUser.addFriend(friend);
+                    usersCollection.whereEqualTo("uid", friendUid).get()
+                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        QuerySnapshot documentSnapshot = task.getResult();
+                                        List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                                        if (documentSnapshotList.size() > 0) {
+                                            currentUser.addFriend(documentSnapshotList.get(0).get("username").toString());
+                                        }
+                                    }
+                                }
+                            });
                 }
+               // String uid = user.getUid();
 
+                // Init username display
+//                usersCollection.whereEqualTo("uid", friendUid).get()
+//                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                                if (task.isSuccessful()) {
+//                                    QuerySnapshot documentSnapshot = task.getResult();
+//                                    List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+//                                    if (documentSnapshotList.size() > 0) {
+//                                        currentUser.addFriend(documentSnapshotList.get(0).get("username").toString());
+//                                    }
+//                                }
+//                            }
+//                        });
                 // Update current user friends list
                 currentUser.addFriend(friendUid);
 
@@ -164,6 +178,8 @@ public class FriendViewActivity extends AppCompatActivity {
     }
 
     private void addFriendButton(String friendId, FirebaseFirestore mFirestore) {
+        FirebaseAuth mAuth = FirebaseUtil.getAuth();
+        FirebaseUser user = mAuth.getCurrentUser();
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -173,15 +189,50 @@ public class FriendViewActivity extends AppCompatActivity {
                             List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
                             if (documentSnapshotList.size() > 0) {
                                 DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
-                                Task<Void> tsk = addFriend(friendId, docRef, mFirestore);
-                                if (tsk.isSuccessful()) {
-                                    System.out.println("addingFriend: taskSuccess");
-                                } else {
-                                    System.out.println("addingFriend: taskFailed");
-                                }
+                                addFriend(friendId, docRef, mFirestore)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    // Friend added successfully
+                                                    Toast.makeText(FriendViewActivity.this, "Friend added successfully", Toast.LENGTH_SHORT).show();
+                                                    refreshFriendList(); // Refresh the friend list after adding a friend
+                                                } else {
+                                                    // Failed to add friend
+                                                    Toast.makeText(FriendViewActivity.this, "Failed to add friend", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
                             }
                         }
                     }
                 });
     }
-}
+
+    private void refreshFriendList() {
+        FirebaseAuth mAuth = FirebaseUtil.getAuth();
+        FirebaseUser user = mAuth.getCurrentUser();
+        usernamesView.clear(); // Clear the existing list
+        // Fetch the updated list of friends from the database
+        usersCollection.whereEqualTo("uid", user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot documentSnapshot = task.getResult();
+                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                            if (documentSnapshotList.size() > 0) {
+                                User currUser = documentSnapshotList.get(0).toObject(User.class);
+                                List<String> friends = currUser.getFriends();
+                                usernamesView.addAll(friends);
+                                friendAdapter.notifyDataSetChanged(); // Notify the adapter of the data change
+                            }
+                        }
+                    }
+                });
+    }
+
+
+    }
+
+

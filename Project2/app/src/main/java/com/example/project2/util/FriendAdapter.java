@@ -31,7 +31,7 @@ public class FriendAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return usernames.get(i);
     }
 
     @Override
@@ -45,6 +45,8 @@ public class FriendAdapter extends BaseAdapter {
         TextView usernameDisplay = view.findViewById(R.id.friend_username);
         Button unfollow = view.findViewById(R.id.remove_friend);
         usernameDisplay.setText(usernames.get(i));
+
+
         unfollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,4 +55,5 @@ public class FriendAdapter extends BaseAdapter {
         });
         return view;
     }
+
 }
