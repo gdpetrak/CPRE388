@@ -106,7 +106,7 @@
 
     <!--Create Post Popup-->
     <LinearLayout
-        android:id="@+id/create_post_popup"
+        android:id="@+id/edit_post_popup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"

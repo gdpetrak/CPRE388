@@ -179,7 +179,7 @@ public class HomeActivity extends AppCompatActivity {
                                     }
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
-                                moodRatingView.add("Mood: " + post.get("moodRating").toString());
+                                moodRatingView.add(post.get("moodRating").toString());
                             }
                             postAdapter.notifyDataSetChanged();
                         }

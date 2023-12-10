@@ -201,7 +201,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
     @Override
     public void onEditPost(String editPostId) {
         // Set popup to be visible
-        LinearLayout editPostPopup = findViewById(R.id.create_post_popup);
+        LinearLayout editPostPopup = findViewById(R.id.edit_post_popup);
         editPostPopup.setVisibility(View.VISIBLE);
 
         // Set up the inputs
@@ -213,7 +213,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
         // Fill the default entries with the old post text
         int postIndex = postRef.indexOf(editPostId);
         String defaultEntry = moodEntryView.get(postIndex);
-        Float defaultMood = Float.parseFloat(moodRatingView.get(postIndex));
+        float defaultMood = Float.parseFloat(moodRatingView.get(postIndex));
         editPostEntryInput.setText(defaultEntry);
         editPostMoodInput.setValue(defaultMood);
 
@@ -287,7 +287,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
                                     }
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
-                                moodRatingView.add("Mood: " + post.get("moodRating").toString());
+                                moodRatingView.add(post.get("moodRating").toString());
                                 postRef.add(post.getId());
                             }
                             postAdapter.notifyDataSetChanged();
