@@ -1,10 +1,13 @@
 package com.example.project2.Activities;
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.project2.Database.User;
 import com.example.project2.R;
@@ -40,6 +44,7 @@ public class FriendViewActivity extends AppCompatActivity {
 
     private FirebaseFirestore mFirestore;
     private CollectionReference usersCollection;
+    private FirebaseUser user;
     FriendAdapter friendAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
 
@@ -59,10 +64,11 @@ public class FriendViewActivity extends AppCompatActivity {
         usersCollection = mFirestore.collection(Collections.USER_COLLECTION_LOCATION);
         Button home = findViewById(R.id.home);
         Button addFriend = findViewById(R.id.add_friend);
+        EditText userText = findViewById(R.id.userText);
         // Init user
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
-
+        String friendUid = mAuth.getUid();
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -94,7 +100,41 @@ public class FriendViewActivity extends AppCompatActivity {
         addFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // addFriend()
+               String friendUser = userText.getText().toString();
+
+
+//                QuerySnapshot documentSnapshot = task.getResult();
+//                List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+//
+//                DocumentReference userRef = usersCollection
+//                        .document(documentSnapshotList.get(0).getId());
+
+
+                usersCollection.whereEqualTo("username", friendUser)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    QuerySnapshot querySnapshot = task.getResult();
+                                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                                        // User with the entered username found
+                                        DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
+                                        String friendUid = userDoc.getString("uid");
+
+                                        // Now you have the friend's UID, proceed to add the friend
+                                        addFriendButton(friendUid, mFirestore);
+                                    } else {
+                                        // User with the entered username not found
+                                        // Handle this case, e.g., show a message to the user
+                                        Toast.makeText(FriendViewActivity.this, "User not found", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    // Handle the error
+                                    Log.e(TAG, "Error searching for user", task.getException());
+                                }
+                            }
+                        });
             }
         });
     }
@@ -121,5 +161,27 @@ public class FriendViewActivity extends AppCompatActivity {
                 return null;
             }
         });
+    }
+
+    private void addFriendButton(String friendId, FirebaseFirestore mFirestore) {
+        usersCollection.whereEqualTo("uid", user.getUid()).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot documentSnapshot = task.getResult();
+                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                            if (documentSnapshotList.size() > 0) {
+                                DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
+                                Task<Void> tsk = addFriend(friendId, docRef, mFirestore);
+                                if (tsk.isSuccessful()) {
+                                    System.out.println("addingFriend: taskSuccess");
+                                } else {
+                                    System.out.println("addingFriend: taskFailed");
+                                }
+                            }
+                        }
+                    }
+                });
     }
 }
