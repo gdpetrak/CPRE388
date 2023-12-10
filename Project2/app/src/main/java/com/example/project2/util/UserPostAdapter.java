@@ -14,12 +14,10 @@ import com.example.project2.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 
-public class UserPostAdapter extends IndividualPostAdapter {
-    private ArrayList<String> postRef;
+public class UserPostAdapter extends MoodPostAdapter {
     private CollectionReference moodPostsCollection;
     private UserPostAdapterDelegate delegate;
 
@@ -27,8 +25,7 @@ public class UserPostAdapter extends IndividualPostAdapter {
                            ArrayList<String> moodEntry, ArrayList<String> moodRating,
                            ArrayList<String> postRef, CollectionReference posts,
                            UserPostAdapterDelegate delegate) {
-        super(applicationContext, usernames, moodEntry, moodRating);
-        this.postRef = postRef;
+        super(applicationContext, usernames, moodEntry, moodRating, postRef);
         this.moodPostsCollection = posts;
         this.delegate = delegate;
         inflatableLayout = R.layout.activity_userpost;

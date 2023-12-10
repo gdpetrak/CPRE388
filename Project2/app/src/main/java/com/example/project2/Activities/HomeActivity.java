@@ -1,6 +1,7 @@
 package com.example.project2.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -17,7 +18,8 @@ import com.example.project2.Database.MoodPost;
 import com.example.project2.R;
 import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
-import com.example.project2.util.IndividualPostAdapter;
+import com.example.project2.util.LikablePostAdapter;
+import com.example.project2.util.LikablePostAdapterDelegate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.slider.Slider;
@@ -25,19 +27,20 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.checkerframework.checker.units.qual.A;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements LikablePostAdapterDelegate {
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
     Timestamp[] timestamps = new Timestamp[3];
@@ -45,11 +48,12 @@ public class HomeActivity extends AppCompatActivity {
     private int[] rating = new int[3];
     private String[] moodEntry = new String[3];
     private CollectionReference usersCollection;
-
-    IndividualPostAdapter postAdapter;
+    private String userId;
+    LikablePostAdapter postAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
     ArrayList<String> moodEntryView = new ArrayList<>();
     ArrayList<String> moodRatingView = new ArrayList<>();
+    ArrayList<String> postRefs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +74,8 @@ public class HomeActivity extends AppCompatActivity {
 
         // Post list init
         ListView listView = (ListView) findViewById(R.id.post_list);
-        postAdapter = new IndividualPostAdapter(getApplicationContext(), usernamesView, moodEntryView, moodRatingView);
+        postAdapter = new LikablePostAdapter(getApplicationContext(), usernamesView, moodEntryView,
+                moodRatingView, postRefs, this);
         listView.setAdapter(postAdapter);
 
         // Input reference init
@@ -86,6 +91,7 @@ public class HomeActivity extends AppCompatActivity {
         // Init user
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
+        userId = user.getUid();
 
         // Init username display
         usersCollection.whereEqualTo("uid", user.getUid()).get()
@@ -144,9 +150,6 @@ public class HomeActivity extends AppCompatActivity {
     private void createPost(String posterId, String moodEntry, int moodRating) {
         MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
         moodPostsCollection.add(post);
-        usernamesView.add("new thing");
-        moodEntryView.add("new thing but body");
-        moodRatingView.add("4");
         updatePostDisplay();
     }
 
@@ -156,6 +159,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updatePostDisplay() {
+        usernamesView.clear();
+        moodEntryView.clear();
+        moodRatingView.clear();
+        postRefs.clear();
         moodPostsCollection.orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -180,10 +187,41 @@ public class HomeActivity extends AppCompatActivity {
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
                                 moodRatingView.add("Mood: " + post.get("moodRating").toString());
+                                postRefs.add(post.getId());
                             }
                             postAdapter.notifyDataSetChanged();
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onLikePost(String likePostId) {
+        DocumentReference postRef = moodPostsCollection.document(likePostId);
+        mFirestore.runTransaction(new Transaction.Function<Transaction>() {
+            @Nullable
+            @Override
+            public Transaction apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot currPost = transaction.get(postRef);
+                MoodPost updatedMoodPost = currPost.toObject(MoodPost.class);
+                updatedMoodPost.addLike(userId);
+                return transaction.set(moodPostsCollection.document(likePostId), updatedMoodPost);
+            }
+        });
+    }
+
+    @Override
+    public void displayLikes(String likePostId, TextView likesDisplay) {
+        DocumentReference postRef = moodPostsCollection.document(likePostId);
+        mFirestore.runTransaction(new Transaction.Function<Void>() {
+            @Nullable
+            @Override
+            public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot snap = transaction.get(postRef);
+                MoodPost post = snap.toObject(MoodPost.class);
+                likesDisplay.setText("Likes: " + post.getLikes());
+                return null;
+            }
+        });
     }
 }
