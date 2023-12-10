@@ -199,7 +199,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
     @Override
     public void onEditPost(String editPostId) {
         // Set popup to be visible
-        LinearLayout editPostPopup = findViewById(R.id.create_post_popup);
+        LinearLayout editPostPopup = findViewById(R.id.edit_post_popup);
         editPostPopup.setVisibility(View.VISIBLE);
 
         // Set up the inputs
@@ -285,7 +285,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
                                     }
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
-                                moodRatingView.add("Mood: " + post.get("moodRating").toString());
+                                moodRatingView.add(post.get("moodRating").toString());
                                 postRef.add(post.getId());
                             }
                             postAdapter.notifyDataSetChanged();

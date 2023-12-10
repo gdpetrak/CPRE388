@@ -186,7 +186,7 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
                                     }
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
-                                moodRatingView.add("Mood: " + post.get("moodRating").toString());
+                                moodRatingView.add(post.get("moodRating").toString());
                                 postRefs.add(post.getId());
                             }
                             postAdapter.notifyDataSetChanged();

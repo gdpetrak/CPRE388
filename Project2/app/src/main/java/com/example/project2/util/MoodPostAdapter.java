@@ -58,7 +58,7 @@ public class MoodPostAdapter extends BaseAdapter {
         TextView ratingDisplay = view.findViewById(R.id.post_mood_rating_display);
         usernameDisplay.setText(usernames.get(i));
         entryDisplay.setText(moodEntry.get(i));
-        ratingDisplay.setText(moodRating.get(i));
+        ratingDisplay.setText("Mood: " + moodRating.get(i));
         return view;
     }
 }
