@@ -35,10 +35,30 @@ import com.google.firebase.firestore.Transaction;
 
 import java.util.List;
 
+/**
+ * This activity allows the user to change their username, sign out, or delete their account.
+ */
 public class ProfileSettingsActivity extends AppCompatActivity {
+
+    /**
+     * Reference to the collection 'users'.
+     */
     private CollectionReference usersCollection;
+
+    /**
+     * Reference to our Firebase.
+     */
     private FirebaseFirestore mFirestore;
+
+    /**
+     * Reference to the current user in Firebase.
+     */
     private FirebaseUser user;
+
+    /**
+     * Initializes the screen when the activity is called.
+     * @param savedInstanceState The previous state of the Activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,10 +78,22 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         alertBuilder.setMessage("Are you sure you want to delete your account?\n" +
                         "(Once an account is deleted, there is no way to recover it)")
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * A button that asks for confirmation if deleting their account is what they actually want.
+                     * @param dialogInterface This is tied to the listener.
+                     * @param i
+                     */
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         assert user != null;
                         user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                            /**
+                             * Sends the newly deleted user back to LandingActivity
+                             * so they can create another account.
+                             * @param task
+                             */
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
@@ -74,6 +106,12 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                         });
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * A button that allows the user to cancel their account deletion.
+                     * @param dialogInterface This is tied to the listener.
+                     * @param i
+                     */
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
@@ -87,11 +125,23 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         alertBuilder.setView(userInput);
         alertBuilder.setMessage("Please enter a new username.")
                 .setPositiveButton("Change Username", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * A button that confirms that the user wants to change their username.
+                     * @param dialogInterface This is tied to the listener.
+                     * @param i
+                     */
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         updateUsernameButton(userInput.getText().toString(), mFirestore);
                     }
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                    /**
+                     * A button that allows the user to cancel changing their username.
+                     * @param dialogInterface This is tied to the listener.
+                     * @param i
+                     */
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
@@ -106,6 +156,10 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         Button changeUsernameButton = findViewById(R.id.change_username_button);
 
         changeUsernameButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * A button that allows the user to change their username.
+             * @param view A reference to the button's view.
+             */
             @Override
             public void onClick(View view) {
                 changeUsernameAlert.show();
@@ -113,6 +167,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         });
 
         signOutButton.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * A button that allows the user to sign out.
+             * @param view A reference to the button's view.
+             */
             @Override
             public void onClick(View view) {
                 mAuth.signOut();
@@ -121,6 +180,10 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         });
 
         deleteAccountButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * A button that allows the user to delete their account.
+             * @param view A reference to the button's view.
+             */
             @Override
             public void onClick(View view) {
                 deleteAccountAlert.show();
@@ -128,6 +191,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         });
 
         backButton.setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * A button that allows the user to return to their profile.
+             * @param view A reference to the button's view.
+             */
             @Override
             public void onClick(View view) {
                 finish();
@@ -135,31 +203,56 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * A button that allows the user to add a new friend.
+     * @param friendId The username of the friend they are trying to add.
+     * @param mFirestore A reference to the Firebase.
+     */
     private void addFriendButton(String friendId, FirebaseFirestore mFirestore) {
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    QuerySnapshot documentSnapshot = task.getResult();
-                    List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
-                    if (documentSnapshotList.size() > 0) {
-                        DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
-                        Task<Void> tsk = addFriend(friendId, docRef, mFirestore);
-                        if (tsk.isSuccessful()) {
-                            System.out.println("addingFriend: taskSuccess");
-                        } else {
-                            System.out.println("addingFriend: taskFailed");
+
+                    /**
+                     * Searches if the username entered is present in the Firebase.
+                     * If so, the username is added to the user's list of friends.
+                     * @param task
+                     */
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot documentSnapshot = task.getResult();
+                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
+                            if (documentSnapshotList.size() > 0) {
+                                DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
+                                Task<Void> tsk = addFriend(friendId, docRef, mFirestore);
+                                if (tsk.isSuccessful()) {
+                                    System.out.println("addingFriend: taskSuccess");
+                                } else {
+                                    System.out.println("addingFriend: taskFailed");
+                                }
+                            }
                         }
                     }
-                }
-            }
         });
     }
 
+    /**
+     * Handles the logic behind adding a friend.
+     * @param friendUid The user ID of the friend to be added.
+     * @param userRef A reference to the user.
+     * @param mFirestore A reference to the Firebase.
+     * @return A task, likely null.
+     */
     private Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
         // Push to database
         return mFirestore.runTransaction(new Transaction.Function<Void>() {
+
+            /**
+             * Applies proper information about the user, friend, and Firebase for adding a friend.
+             * @param transaction The transaction between the user and Firebase.
+             * @return A task, likely null.
+             * @throws FirebaseFirestoreException Exception if the Firebase is unruly accessed.
+             */
             @Nullable
             @Override
             public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
@@ -182,9 +275,19 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * The logic that goes behind pressing the button to change your username.
+     * @param username The new username to be entered in for the user.
+     * @param mFirestore A reference to the Firebase.
+     */
     private void updateUsernameButton(String username, FirebaseFirestore mFirestore) {
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                    /**
+                     * Updates the references for the previous username when it comes to the user's old posts.
+                     * @param task The task that is being completed.
+                     */
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
@@ -204,9 +307,23 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Handles logic behind updating a user's username is correlation to their friends list.
+     * @param username The new username.
+     * @param userRef The reference to the user.
+     * @param mFirestore A reference to the Firebase.
+     * @return A task, likely null.
+     */
     private Task<Void> updateUsername(String username, DocumentReference userRef, FirebaseFirestore mFirestore) {
         // Push to database
         return mFirestore.runTransaction(new Transaction.Function<Void>() {
+
+            /**
+             * Applies proper information about the user, user's friends, and Firebase for changing their username.
+             * @param transaction The transaction between the user and Firebase.
+             * @return A task, likely null.
+             * @throws FirebaseFirestoreException Exception if the Firebase is unruly accessed.
+             */
             @Nullable
             @Override
             public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {

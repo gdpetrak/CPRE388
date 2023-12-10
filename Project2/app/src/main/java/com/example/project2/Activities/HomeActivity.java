@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This is screen is where users will be sent when successfully logged in.
+ * This is the screen is where users will be sent when successfully logged in.
  * They can view other's mood posts and create one themselves.
  */
 public class HomeActivity extends AppCompatActivity {
