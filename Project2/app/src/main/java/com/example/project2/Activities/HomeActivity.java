@@ -67,6 +67,7 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton accountButton = findViewById(R.id.profile_button);
         LinearLayout createPostPopup = findViewById(R.id.create_post_popup);
         TextView usernameDisplay = findViewById(R.id.username_display);
+        ImageButton addFriend = findViewById(R.id.add_friend);
 
         // Post list init
         ListView listView = (ListView) findViewById(R.id.post_list);
@@ -139,6 +140,13 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         updatePostDisplay();
+
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HomeActivity.this, FriendViewActivity.class));
+            }
+        });
     }
 
     private void createPost(String posterId, String moodEntry, int moodRating) {
