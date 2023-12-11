@@ -27,7 +27,6 @@ public class User {
     }
     public User(){
             friends = new ArrayList<>();
-
     }
 
     public void updateUsername(String username) {
@@ -60,7 +59,7 @@ public class User {
     public void setUid(String uid){
         this.uid = uid;
     }
-    public void setFriend(List<String> friends){
+    public void setFriends(List<String> friends){
         this.friends = friends;
     }
 

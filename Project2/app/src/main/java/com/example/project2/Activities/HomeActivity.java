@@ -1,5 +1,8 @@
 package com.example.project2.Activities;
 
+import static com.google.firebase.firestore.Filter.equalTo;
+import static com.google.firebase.firestore.Filter.or;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
+import com.example.project2.Database.User;
 import com.example.project2.R;
 import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;

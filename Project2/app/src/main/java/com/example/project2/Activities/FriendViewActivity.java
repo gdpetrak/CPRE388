@@ -142,7 +142,7 @@ public class FriendViewActivity extends AppCompatActivity {
                 // Add the new friend only if it doesn't exist in the list
                 if (!friends.contains(friendUid)) {
                     friends.add(friendUid);
-                    currentUser.setFriend(friends);
+                    currentUser.setFriends(friends);
                     transaction.set(userRef, currentUser);
                 }
 
@@ -216,7 +216,6 @@ public class FriendViewActivity extends AppCompatActivity {
                                 System.out.println("usernamesView before update: " + usernamesView);
 
                                 // Clear the list and add all friends
-//                                usernamesView.addAll(friends);
                                 usernamesView.clear();
                                 friendIds.clear();
                                 for (String friend:friends) {
