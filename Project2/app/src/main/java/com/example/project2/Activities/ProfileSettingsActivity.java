@@ -35,6 +35,10 @@ import com.google.firebase.firestore.Transaction;
 
 import java.util.List;
 
+/**
+ * Activity that allows the user to edit their profile
+ * Creates buttons for changing username, signing out, and deleting their account
+ */
 public class ProfileSettingsActivity extends AppCompatActivity {
     private CollectionReference usersCollection;
     private FirebaseFirestore mFirestore;
@@ -135,53 +139,11 @@ public class ProfileSettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void addFriendButton(String friendId, FirebaseFirestore mFirestore) {
-        usersCollection.whereEqualTo("uid", user.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    QuerySnapshot documentSnapshot = task.getResult();
-                    List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
-                    if (documentSnapshotList.size() > 0) {
-                        DocumentReference docRef = usersCollection.document(documentSnapshotList.get(0).getId());
-                        Task<Void> tsk = addFriend(friendId, docRef, mFirestore);
-                        if (tsk.isSuccessful()) {
-                            System.out.println("addingFriend: taskSuccess");
-                        } else {
-                            System.out.println("addingFriend: taskFailed");
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    private Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
-        // Push to database
-        return mFirestore.runTransaction(new Transaction.Function<Void>() {
-            @Nullable
-            @Override
-            public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
-                DocumentSnapshot currUserDoc = transaction.get(userRef);
-                String username = currUserDoc.get("username").toString();
-                String uid = currUserDoc.get("uid").toString();
-                List<String> friends = (List<String>) currUserDoc.get("friends");
-
-                User currentUser = new User(username, uid);
-                for (String friend : friends) {
-                    currentUser.addFriend(friend);
-                }
-
-                // Update current user friends list
-                currentUser.addFriend(friendUid);
-
-                transaction.set(userRef, currentUser);
-                return null;
-            }
-        });
-    }
-
+    /**
+     * A method that is called when the user confirms their new username
+     * @param username The new username to be saved
+     * @param mFirestore A reference to the Firestore
+     */
     private void updateUsernameButton(String username, FirebaseFirestore mFirestore) {
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -204,6 +166,14 @@ public class ProfileSettingsActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Handles actually running the transaction to update the username
+     * When this method is called, the username will be updated in the database
+     * @param username The new username to save
+     * @param userRef A reference to the location of the current user in the database
+     * @param mFirestore A reference to the Firestore
+     * @return Void
+     */
     private Task<Void> updateUsername(String username, DocumentReference userRef, FirebaseFirestore mFirestore) {
         // Push to database
         return mFirestore.runTransaction(new Transaction.Function<Void>() {

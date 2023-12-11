@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/primary_50"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!--line graph view where we will
-       be displaying our data-->
+    android:layout_height="match_parent"
+    android:background="@color/primary_50"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,108 +24,87 @@
                 android:id="@+id/back_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/home"
-                android:backgroundTint="@color/primary_700"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/username_display"
-                app:layout_constraintHorizontal_bias="0.1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/username_display"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_page"
-                android:textColor="@color/primary_900"
+                android:text="@string/back"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.05"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/settings_button"
+                android:id="@+id/create_comment_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Settings"
-                android:backgroundTint="@color/primary_700"
+                android:text="@string/comment"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/username_display"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintHorizontal_bias="0.9" />
+                app:layout_constraintHorizontal_bias="0.95"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/motivation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:paddingHorizontal="15dp"
-            android:layout_marginTop="15dp"
-            android:gravity="center"
-            android:layout_gravity="center_horizontal"
-            app:layout_constraintBottom_toTopOf="@+id/idGraphView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-            app:layout_constraintVertical_bias="0.3" />
-
-        <Button
-            android:id="@+id/share_button"
-            android:text="@string/share_quote"
-            android:backgroundTint="@color/primary_700"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-
-        <!--line graph view where we will
-           be displaying our data-->
-
-        <com.jjoe64.graphview.GraphView
-            android:id="@+id/idGraphView"
-            android:layout_width="350dp"
-            android:layout_height="300dp"
-            android:layout_alignParentTop="true"
-            android:layout_gravity="center_horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/motivation"
-            android:layout_marginTop="15dp"
-            tools:layout_editor_absoluteY="161dp" />
-
-        <Button
-            android:id="@+id/share_graph_button"
-            android:text="@string/share_graph"
-            android:backgroundTint="@color/primary_700"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"/>
-
-        <!--Post Display-->
-        <ListView
-            android:id="@+id/post_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
+        <!--Original Post-->
+        <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            card_view:cardBackgroundColor="@color/primary_500"
+            card_view:cardCornerRadius="10dp"
             android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/post_view_username_display"
+                    android:text="@string/temp_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_margin="15dp" />
+
+                <TextView
+                    android:id="@+id/post_view_mood_entry_display"
+                    android:text="@string/temp_text_here_ni_was_feeling_really_sad_nso_sad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginBottom="15dp"/>
+
+                <TextView
+                    android:id="@+id/post_view_mood_rating_display"
+                    android:text="@string/mood_rating"
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginBottom="15dp"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <ListView
+            android:id="@+id/post_comments"
             android:divider="@color/primary_50"
             android:dividerHeight="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/idGraphView" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"/>
 
     </LinearLayout>
 
-    <!--Create Post Popup-->
+    <!--Create Comment Popup-->
     <LinearLayout
-        android:id="@+id/edit_post_popup"
+        android:id="@+id/create_comment_popup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -146,7 +121,6 @@
             android:layout_weight="0.8">
 
             <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 card_view:cardBackgroundColor="@color/primary_400"
                 card_view:cardCornerRadius="10dp"
                 android:layout_width="match_parent"
@@ -171,14 +145,14 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.7"
-                            android:id="@+id/username_display"
+                            android:id="@+id/comment_username_display"
                             android:text="@string/username" />
 
                         <Button
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.3"
-                            android:id="@+id/close_create_post"
+                            android:id="@+id/close_create_comment"
                             android:text="@string/close"
                             android:theme="@style/Button.Default"
                             android:backgroundTint="@color/primary_700"/>
@@ -189,33 +163,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:id="@+id/mood_entry"
+                        android:id="@+id/comment_entry"
                         android:gravity="start|top"
                         android:inputType="textMultiLine"
                         android:layout_marginHorizontal="10sp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10sp"
-                        android:text="Mood Rating"
-                        android:labelFor="@+id/mood_rating"
-                        android:layout_gravity="start"/>
-
-                    <com.google.android.material.slider.Slider
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="10sp"
-                        android:id="@+id/mood_rating"
-                        android:stepSize="1"
-                        android:value="3"
-                        android:valueFrom="1"
-                        android:valueTo="5"/>
-
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/finish_edit_post"
+                        android:id="@+id/post_comment_button"
                         android:text="@string/post"
                         android:layout_marginHorizontal="10sp"
                         android:layout_gravity="end"

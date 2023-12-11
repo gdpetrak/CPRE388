@@ -1,11 +1,16 @@
 package com.example.project2.Activities;
 
+import static com.google.firebase.firestore.Filter.equalTo;
+import static com.google.firebase.firestore.Filter.or;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -14,10 +19,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
+import com.example.project2.Database.User;
 import com.example.project2.R;
 import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
-import com.example.project2.util.IndividualPostAdapter;
+import com.example.project2.util.LikablePostAdapter;
+import com.example.project2.util.LikablePostAdapterDelegate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.slider.Slider;
@@ -25,19 +32,25 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.checkerframework.checker.units.qual.A;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
-public class HomeActivity extends AppCompatActivity {
+/**
+ * The homescreen
+ * Handles displaying all recently made mood posts and allows the user to create their own mood
+ * posts, view other mood post comments, like posts, and navigate to other screens
+ */
+public class HomeActivity extends AppCompatActivity implements LikablePostAdapterDelegate {
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
     Timestamp[] timestamps = new Timestamp[3];
@@ -45,11 +58,12 @@ public class HomeActivity extends AppCompatActivity {
     private int[] rating = new int[3];
     private String[] moodEntry = new String[3];
     private CollectionReference usersCollection;
-
-    IndividualPostAdapter postAdapter;
+    private String userId;
+    LikablePostAdapter postAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
     ArrayList<String> moodEntryView = new ArrayList<>();
     ArrayList<String> moodRatingView = new ArrayList<>();
+    ArrayList<String> postRefs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,11 +81,23 @@ public class HomeActivity extends AppCompatActivity {
         ImageButton accountButton = findViewById(R.id.profile_button);
         LinearLayout createPostPopup = findViewById(R.id.create_post_popup);
         TextView usernameDisplay = findViewById(R.id.username_display);
+        ImageButton addFriend = findViewById(R.id.add_friend);
 
         // Post list init
         ListView listView = (ListView) findViewById(R.id.post_list);
-        postAdapter = new IndividualPostAdapter(getApplicationContext(), usernamesView, moodEntryView, moodRatingView);
+        postAdapter = new LikablePostAdapter(getApplicationContext(), usernamesView, moodEntryView,
+                moodRatingView, postRefs, this);
         listView.setAdapter(postAdapter);
+        listView.setClickable(true);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(HomeActivity.this, PostViewActivity.class);
+                intent.putExtra("postref", postRefs.get(position));
+                intent.putExtra("username", usernamesView.get(position));
+                startActivity(intent);
+            }
+        });
 
         // Input reference init
         EditText createPostEntryInput = ((EditText) findViewById(R.id.mood_entry));
@@ -86,6 +112,7 @@ public class HomeActivity extends AppCompatActivity {
         // Init user
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
+        userId = user.getUid();
 
         // Init username display
         usersCollection.whereEqualTo("uid", user.getUid()).get()
@@ -139,23 +166,51 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         updatePostDisplay();
+
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HomeActivity.this, FriendViewActivity.class));
+            }
+        });
     }
 
-    private void createPost(String posterId, String moodEntry, int moodRating) {
-        MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
-        moodPostsCollection.add(post);
-        usernamesView.add("new thing");
-        moodEntryView.add("new thing but body");
-        moodRatingView.add("4");
+    @Override
+    protected void onResume() {
+        super.onResume();
         updatePostDisplay();
     }
 
+    /**
+     * A method that creates a MoodPost object for the current mood post information then sends a
+     * post to the database before updating the display
+     * @param posterId The id of the user who is creating the post
+     * @param moodEntry The text entry for the mood post
+     * @param moodRating The slider bar entry for the mood post
+     */
+    private void createPost(String posterId, String moodEntry, int moodRating) {
+        MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
+        moodPostsCollection.add(post);
+        updatePostDisplay();
+    }
+
+    /**
+     * A method that takes in an already created MoodPost and sends it to the database
+     * @param post The MoodPost to be sent to the database
+     */
     private void createPost(MoodPost post) {
         moodPostsCollection.add(post);
         updatePostDisplay();
     }
 
+    /**
+     * Pulls post information from the database and updates the display
+     */
     private void updatePostDisplay() {
+        usernamesView.clear();
+        moodEntryView.clear();
+        moodRatingView.clear();
+        postRefs.clear();
         moodPostsCollection.orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -180,10 +235,50 @@ public class HomeActivity extends AppCompatActivity {
                                 });
                                 moodEntryView.add(post.get("moodEntry").toString());
                                 moodRatingView.add(post.get("moodRating").toString());
+                                postRefs.add(post.getId());
                             }
                             postAdapter.notifyDataSetChanged();
                         }
                     }
                 });
+    }
+
+    /**
+     * Runs a transaction to update the like count on a post
+     * @param likePostId The post being liked
+     */
+    @Override
+    public void onLikePost(String likePostId) {
+        DocumentReference postRef = moodPostsCollection.document(likePostId);
+        mFirestore.runTransaction(new Transaction.Function<Transaction>() {
+            @Nullable
+            @Override
+            public Transaction apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot currPost = transaction.get(postRef);
+                MoodPost updatedMoodPost = currPost.toObject(MoodPost.class);
+                updatedMoodPost.addLike(userId);
+                return transaction.set(moodPostsCollection.document(likePostId), updatedMoodPost);
+            }
+        });
+    }
+
+    /**
+     * Handles getting the current like count for each post and updating the count
+     * @param likePostId The post id of the post being displayed
+     * @param likesDisplay The TextView for the likes display
+     */
+    @Override
+    public void displayLikes(String likePostId, TextView likesDisplay) {
+        DocumentReference postRef = moodPostsCollection.document(likePostId);
+        mFirestore.runTransaction(new Transaction.Function<Void>() {
+            @Nullable
+            @Override
+            public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
+                DocumentSnapshot snap = transaction.get(postRef);
+                MoodPost post = snap.toObject(MoodPost.class);
+                likesDisplay.setText("Likes: " + post.getLikes());
+                return null;
+            }
+        });
     }
 }

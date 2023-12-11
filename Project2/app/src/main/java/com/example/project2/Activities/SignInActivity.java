@@ -22,6 +22,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * Activity that handles signing a user in
+ * Initializes two edit texts for email and password input
+ * Once the sign in button is pressed uses Firebase Auth to attempt a sign in
+ * Popups are created if the app fails to sign in for any reason
+ */
 public class SignInActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     @Override

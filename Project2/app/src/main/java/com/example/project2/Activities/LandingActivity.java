@@ -13,7 +13,14 @@ import com.example.project2.util.FirebaseUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/**
+ * Handles either automatically signing the user in if they have signed in previously
+ * or shows them an option between registering and signing in
+ */
 public class LandingActivity extends AppCompatActivity {
+    /**
+     * A reference to the Firebase Auth functionality
+     */
     private FirebaseAuth mAuth;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -15,11 +15,10 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <Button
-            android:id="@+id/back_button"
+            android:id="@+id/home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/back"
-            android:backgroundTint="@color/primary_700"
+            android:text="@string/home"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/textView"
             app:layout_constraintHorizontal_bias="0.1"
@@ -31,7 +30,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/account_settings"
+            android:text="@string/friend_page"
             android:textColor="@color/primary_900"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -46,34 +45,39 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="15dp"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
-        <Button
-            android:id="@+id/change_username_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/primary_700"
-            android:text="@string/change_username" />
+        <EditText
+            android:id="@+id/userText"
+            android:layout_width="172dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="100dp" />
 
         <Button
-            android:id="@+id/sign_out"
+            android:id="@+id/add_friend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="30dp"
             android:backgroundTint="@color/primary_700"
-            android:text="@string/sign_out" />
+            android:text="@string/friend_page" />
 
-        <Button
-            android:id="@+id/delete_account"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/attention"
-            android:text="@string/delete_account"
-            android:theme="@style/Button.Attention" />
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/friend_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="10dp"
+        android:divider="@color/cardview_light_background"
+        android:dividerHeight="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/accountManagement"
+        app:layout_constraintHeight_default="spread"
+        app:layout_constraintWidth_default="spread" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
