@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -68,6 +69,16 @@ public class FriendViewActivity extends AppCompatActivity {
         ListView listView = (ListView) findViewById(R.id.friend_list);
         friendAdapter = new FriendAdapter(getApplicationContext(), usernamesView);
         listView.setAdapter(friendAdapter);
+        listView.setClickable(true);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(FriendViewActivity.this, FriendProfileActivity.class);
+                intent.putExtra("frienduid", friendIds.get(position));
+                intent.putExtra("friendusername", usernamesView.get(position));
+                startActivity(intent);
+            }
+        });
 
         ProfileSettingsActivity profileSettingsActivity = new ProfileSettingsActivity();
         FirebaseFirestore.setLoggingEnabled(true);
@@ -77,6 +88,7 @@ public class FriendViewActivity extends AppCompatActivity {
         Button home = findViewById(R.id.home);
         Button addFriend = findViewById(R.id.add_friend);
         EditText userText = findViewById(R.id.userText);
+
         // Init user
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
