@@ -1,5 +1,8 @@
 package com.example.project2.Activities;
 
+import static com.google.firebase.firestore.Filter.equalTo;
+import static com.google.firebase.firestore.Filter.or;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.project2.Database.MoodPost;
+import com.example.project2.Database.User;
 import com.example.project2.R;
 import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
@@ -72,6 +76,7 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
         ImageButton accountButton = findViewById(R.id.profile_button);
         LinearLayout createPostPopup = findViewById(R.id.create_post_popup);
         TextView usernameDisplay = findViewById(R.id.username_display);
+        ImageButton addFriend = findViewById(R.id.add_friend);
 
         // Post list init
         ListView listView = (ListView) findViewById(R.id.post_list);
@@ -156,6 +161,13 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
         });
 
         updatePostDisplay();
+
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(HomeActivity.this, FriendViewActivity.class));
+            }
+        });
     }
 
     @Override

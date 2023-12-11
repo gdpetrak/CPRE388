@@ -25,6 +25,9 @@ public class User {
         this.uid = uid;
         friends = new ArrayList<>();
     }
+    public User(){
+            friends = new ArrayList<>();
+    }
 
     public void updateUsername(String username) {
         this.username = username;
@@ -46,4 +49,20 @@ public class User {
     public void addFriend(String friendUid) {
         friends.add(friendUid);
     }
+    public void removeFriend(String friendUid) {
+        friends.remove(friendUid);
+    }
+
+    public void setUsername(String username){
+        this.username = username;
+    }
+    public void setUid(String uid){
+        this.uid = uid;
+    }
+    public void setFriends(List<String> friends){
+        this.friends = friends;
+    }
+
+
+
 }

@@ -45,8 +45,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Java Class that will handle the logic of the Profile Activity page.
+ * When the Profile page is created, it will display a graph to the user
+ * showing the trend of their last 5 Mood entries. The page will also have display
+ * the last 50 mood entries that the user has posted. The page has a Settings button
+ * and a Home button.
+ */
 public class ProfileActivity extends AppCompatActivity implements UserPostAdapterDelegate {
-
     String[] quotes = {"It does not matter how slowly you go as long as you do not stop.",
             "Quality is not an act, it is a habit.",
             "Life is 10% what happens to you and 90% how you react to it.",
@@ -57,12 +63,27 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
             "Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.",
             "Ever tried. Ever failed. No matter. Try again. Fail again. Fail better.",
             "If you can dream it, you can do it."};
-
+    /**
+     * graphView will be the graph that is displayed showing the Mood trend of a user.
+     */
     GraphView graphView;
+    /**
+     * mFirestore allows the app to communicate with the database and allow
+     * transactions.
+     */
     private FirebaseFirestore mFirestore;
+    /**
+     * moodPostsCollection reference to access the mood collection
+     */
     private CollectionReference moodPostsCollection;
+    /**
+     * userCollection reference to access the user collection
+     */
     private CollectionReference usersCollection;
-    int[] userX = new int[5];
+
+    /**
+     * Integer array that will hold the values of the latest mood ratings for the Mood trend graph.
+     */
     int[] userY = new int[5];
     int i = 4;
 
