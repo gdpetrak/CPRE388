@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -111,6 +112,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
         // Init layout references
         Button backButton = findViewById(R.id.back_button);
         Button settingsButton = findViewById(R.id.settings_button);
+        Button shareButton = findViewById(R.id.share_button);
         TextView motivationalQuotes = findViewById(R.id.motivation);
         TextView usernameDisplay = findViewById(R.id.username_display);
 
@@ -149,6 +151,19 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(ProfileActivity.this, ProfileSettingsActivity.class));
+            }
+        });
+
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, motivationalQuotes.getText().toString());
+                sendIntent.setType("text/plain");
+
+                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                startActivity(shareIntent);
             }
         });
 

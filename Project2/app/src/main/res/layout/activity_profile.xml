@@ -29,6 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/home"
+                android:backgroundTint="@color/primary_700"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/username_display"
                 app:layout_constraintHorizontal_bias="0.1"
@@ -51,6 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Settings"
+                android:backgroundTint="@color/primary_700"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/username_display"
@@ -73,6 +75,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
             app:layout_constraintVertical_bias="0.3" />
+
+        <Button
+            android:id="@+id/share_button"
+            android:text="@string/share_quote"
+            android:backgroundTint="@color/primary_700"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
 
         <!--line graph view where we will
            be displaying our data-->
