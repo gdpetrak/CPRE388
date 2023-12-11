@@ -151,6 +151,8 @@ public class PostViewActivity extends AppCompatActivity {
                 DocumentSnapshot currPostSnap = transaction.get(moodPostsCollection.document(postid));
                 MoodPost currPost = currPostSnap.toObject(MoodPost.class);
                 currPost.addComment(comment);
+                commentsList.add(comment);
+                postAdapter.notifyDataSetChanged();
                 return transaction.set(moodPostsCollection.document(postid), currPost);
             }
         });
