@@ -36,6 +36,9 @@
         <activity
             android:name=".Activities.ProfileSettingsActivity"
             android:exported="false"/>
+        <activity
+            android:name=".Activities.PostViewActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

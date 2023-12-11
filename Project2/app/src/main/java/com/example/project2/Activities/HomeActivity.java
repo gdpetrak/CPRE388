@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -77,6 +78,16 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
         postAdapter = new LikablePostAdapter(getApplicationContext(), usernamesView, moodEntryView,
                 moodRatingView, postRefs, this);
         listView.setAdapter(postAdapter);
+        listView.setClickable(true);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(HomeActivity.this, PostViewActivity.class);
+                intent.putExtra("postref", postRefs.get(position));
+                intent.putExtra("username", usernamesView.get(position));
+                startActivity(intent);
+            }
+        });
 
         // Input reference init
         EditText createPostEntryInput = ((EditText) findViewById(R.id.mood_entry));
@@ -144,6 +155,12 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
             }
         });
 
+        updatePostDisplay();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         updatePostDisplay();
     }
 

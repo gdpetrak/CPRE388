@@ -1,5 +1,6 @@
 package com.example.project2.Database;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,6 +10,7 @@ public class MoodPost {
     private String moodEntry, posterId;
     private Date postTime;
     private List<String> userLikes;
+    private List<String> comments;
 
     public MoodPost() {
 
@@ -20,6 +22,7 @@ public class MoodPost {
         this.moodRating = moodRating;
         this.postTime = new Date();
         this.userLikes = new ArrayList<>();
+        this.comments = new ArrayList<>();
     }
 
     public String getPosterId() {
@@ -40,6 +43,10 @@ public class MoodPost {
 
     public List<String> getUserLikes() {
         return userLikes;
+    }
+
+    public List<String> getComments() {
+        return comments;
     }
 
     public int getLikes() {
@@ -66,6 +73,9 @@ public class MoodPost {
         this.userLikes = userLikes;
     }
 
+    public void setComments(List<String> comments) {
+        this.comments = comments;
+    }
 
     /**
      * Add the current user to the list of users who have liked a post
@@ -78,5 +88,9 @@ public class MoodPost {
 
         userLikes.add(likingUser);
         return true;
+    }
+
+    public void addComment(String comment) {
+        this.comments.add(comment);
     }
 }
