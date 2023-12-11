@@ -23,9 +23,12 @@ import com.example.project2.util.Collections;
 import com.example.project2.util.FirebaseUtil;
 import com.example.project2.util.FriendAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import com.example.project2.Activities.ProfileSettingsActivity;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -39,7 +42,15 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
+/**
+ * The FriendViewActivity class cerates the Add Friend page, including the EditText that allows
+ * a user to enter a friend's username, and the Add Friend Button which adds the username of a friend
+ * to the User's list of friends.
+ */
 public class FriendViewActivity extends AppCompatActivity {
 
     private FirebaseFirestore mFirestore;
@@ -123,6 +134,15 @@ public class FriendViewActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * Helper method that adds the friend's username to Firebase and sets the usernames
+     * of the friends' of the user into a list so that it may be displayed in a ListView.
+     * @param friendUid
+     * @param userRef
+     * @param mFirestore
+     * @return
+     */
     private Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
         // Push to database
         return mFirestore.runTransaction(new Transaction.Function<Void>() {
@@ -130,53 +150,42 @@ public class FriendViewActivity extends AppCompatActivity {
             @Override
             public Void apply(@NonNull Transaction transaction) throws FirebaseFirestoreException {
                 DocumentSnapshot currUserDoc = transaction.get(userRef);
-                String username = currUserDoc.get("username").toString();
-                String uid = currUserDoc.get("uid").toString();
+                String username = currUserDoc.getString("username");
                 List<String> friends = (List<String>) currUserDoc.get("friends");
 
-                // Assuming User class has a method like addFriend
-                User currentUser = new User(username, uid);
-                for (String friend : friends) {
-                  //  currentUser.addFriend(friend);
-                    usersCollection.whereEqualTo("uid", friendUid).get()
-                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        QuerySnapshot documentSnapshot = task.getResult();
-                                        List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
-                                        if (documentSnapshotList.size() > 0) {
-                                            currentUser.addFriend(documentSnapshotList.get(0).get("username").toString());
-                                        }
-                                    }
-                                }
-                            });
+                // Fetch the friend's username
+                try {
+                    QuerySnapshot friendQuerySnapshot = Tasks.await(usersCollection.whereEqualTo("uid", friendUid).get());
+                    if (!friendQuerySnapshot.isEmpty()) {
+                        DocumentSnapshot friendSnapshot = friendQuerySnapshot.getDocuments().get(0);
+                        String friendUsername = friendSnapshot.getString("username");
+
+                        // Assuming User class has a method like setFriends
+                        User currentUser = new User(username, currUserDoc.getString("uid"));
+
+                        // Add the new friend only if it doesn't exist in the list
+                        if (!friends.contains(friendUsername)) {
+                            friends.add(friendUsername);
+                            currentUser.setFriend(friends);
+                            transaction.set(userRef, currentUser);
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error fetching friend's username", e);
                 }
-               // String uid = user.getUid();
 
-                // Init username display
-//                usersCollection.whereEqualTo("uid", friendUid).get()
-//                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                                if (task.isSuccessful()) {
-//                                    QuerySnapshot documentSnapshot = task.getResult();
-//                                    List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
-//                                    if (documentSnapshotList.size() > 0) {
-//                                        currentUser.addFriend(documentSnapshotList.get(0).get("username").toString());
-//                                    }
-//                                }
-//                            }
-//                        });
-                // Update current user friends list
-                currentUser.addFriend(friendUid);
-
-                transaction.set(userRef, currentUser);
                 return null;
             }
         });
     }
 
+
+    /**
+     * helper method that helps create the necessary parameters needed for the addFriend method as
+     * well as provide checks to see if the Task of adding a friend was successful.
+     * @param friendId
+     * @param mFirestore
+     */
     private void addFriendButton(String friendId, FirebaseFirestore mFirestore) {
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
@@ -209,10 +218,15 @@ public class FriendViewActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Helper method that clears the list of usernames so that the listview is refreshed after
+     * adding a new friend, adding the new username in real time.
+     */
     private void refreshFriendList() {
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
         usernamesView.clear(); // Clear the existing list
+
         // Fetch the updated list of friends from the database
         usersCollection.whereEqualTo("uid", user.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -224,15 +238,69 @@ public class FriendViewActivity extends AppCompatActivity {
                             if (documentSnapshotList.size() > 0) {
                                 User currUser = documentSnapshotList.get(0).toObject(User.class);
                                 List<String> friends = currUser.getFriends();
+                                System.out.println(friends);
+
+                                // Print the content of friends before updating the list
+                                System.out.println("usernamesView before update: " + usernamesView);
+
+                                // Clear the list and add all friends
                                 usernamesView.addAll(friends);
-                                friendAdapter.notifyDataSetChanged(); // Notify the adapter of the data change
+
+                                // Notify the adapter of the data change
+                                friendAdapter.notifyDataSetChanged();
+
+                                // Print the content of friends after updating the list
+                                System.out.println("usernamesView after update: " + usernamesView);
                             }
                         }
                     }
                 });
     }
 
+//    private void handleUnfollow(String friendUsername) {
+//        FirebaseAuth mAuth = FirebaseUtil.getAuth();
+//        FirebaseUser user = mAuth.getCurrentUser();
+//
+//        DocumentReference userRef = usersCollection.document(user.getUid());
+//
+//        // Fetch the current user document
+//        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    DocumentSnapshot document = task.getResult();
+//                    if (document.exists()) {
+//                        // Assuming User class has a method like removeFriend
+//                        User currentUser = document.toObject(User.class);
+//                        currentUser.removeFriend(friendUsername);
+//
+//                        // Update the user document
+//                        userRef.set(currentUser)
+//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                    @Override
+//                                    public void onSuccess(Void aVoid) {
+//                                        // Remove the friend from the local list
+//                                        usernamesView.remove(friendUsername);
+//                                        // Notify the adapter of the data change
+//                                        friendAdapter.notifyDataSetChanged();
+//                                        Toast.makeText(FriendViewActivity.this, "Unfollowed " + friendUsername, Toast.LENGTH_SHORT).show();
+//                                    }
+//                                })
+//                                .addOnFailureListener(new OnFailureListener() {
+//                                    @Override
+//                                    public void onFailure(@NonNull Exception e) {
+//                                        Log.e(TAG, "Error updating user document after unfollow", e);
+//                                    }
+//                                });
+//                    }
+//                } else {
+//                    Log.e(TAG, "Error fetching current user document", task.getException());
+//                }
+//            }
+//        });
+//    }
 
-    }
+
+}
 
 

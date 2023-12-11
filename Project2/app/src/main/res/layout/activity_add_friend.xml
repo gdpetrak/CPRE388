@@ -54,26 +54,30 @@
             android:layout_width="172dp"
             android:layout_height="match_parent"
             android:layout_marginTop="100dp" />
+
         <Button
             android:id="@+id/add_friend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:backgroundTint="@color/primary_700"
             android:layout_marginTop="30dp"
+            android:backgroundTint="@color/primary_700"
             android:text="@string/friend_page" />
 
     </LinearLayout>
 
     <ListView
         android:id="@+id/friend_list"
-        android:layout_width="371dp"
-        android:layout_height="433dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_margin="10dp"
         android:divider="@color/cardview_light_background"
         android:dividerHeight="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/accountManagement"></ListView>
+        app:layout_constraintTop_toBottomOf="@+id/accountManagement"
+        app:layout_constraintHeight_default="spread"
+        app:layout_constraintWidth_default="spread" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

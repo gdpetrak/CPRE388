@@ -50,6 +50,9 @@ public class User {
     public void addFriend(String friendUid) {
         friends.add(friendUid);
     }
+    public void removeFriend(String friendUid) {
+        friends.remove(friendUid);
+    }
 
     public void setUsername(String username){
         this.username = username;
