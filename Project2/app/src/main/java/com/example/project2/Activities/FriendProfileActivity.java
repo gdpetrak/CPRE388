@@ -136,7 +136,7 @@ public class FriendProfileActivity extends AppCompatActivity implements LikableP
 
         // Render the graphs
         System.out.println("moodpostretrieval: task starting");
-        moodPostsCollection.whereEqualTo("posterId", user.getUid())
+        moodPostsCollection.whereEqualTo("posterId", friendUid)
                 .orderBy("postTime", Query.Direction.DESCENDING).limit(5)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
