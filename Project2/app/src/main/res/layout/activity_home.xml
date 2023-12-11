@@ -57,7 +57,7 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:dividerHeight="10dp"
-            android:divider="@color/cardview_light_background">
+            android:divider="@color/primary_50">
         </ListView>
 
     </LinearLayout>
@@ -173,6 +173,5 @@
             android:layout_weight="0.1"/>
 
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
