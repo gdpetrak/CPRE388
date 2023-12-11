@@ -99,6 +99,10 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
     int[] userY = new int[5];
     int i = 4;
 
+    /**
+     * ListView Adapter variables
+     * Data that needs to be displayed from within the adapter
+     */
     UserPostAdapter postAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
     ArrayList<String> moodEntryView = new ArrayList<>();
@@ -272,6 +276,14 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
         updatePostDisplay(uid);
     }
 
+    /**
+     * A callback that is triggered when a user clicks on the edit button of a post
+     * Sets the edit post popup to be visible and initializes onClickListeners for the buttons
+     * Registers the post id to keep track of which post is being edited
+     * Once the Edit Post button is pressed the onClickListener is fired and a transaction starts
+     * to send the edited post to the database
+     * @param editPostId The id of the post being edited
+     */
     @Override
     public void onEditPost(String editPostId) {
         // Set popup to be visible
@@ -337,6 +349,11 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
         });
     }
 
+    /**
+     * Handles updating the list of posts below the graphview
+     * Only displays posts that match the current uid
+     * @param uid The uid of the current user
+     */
     private void updatePostDisplay(String uid) {
         moodPostsCollection.whereEqualTo("posterId", uid).orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

@@ -27,9 +27,18 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Activity that handles registering a new user
+ * Three edit texts are initialized for input for the username, email, and password
+ * Once the register button is pressed a new User is created and uploaded to the database
+ */
 public class RegisterActivity extends AppCompatActivity {
+    /**
+     * References to the Firebase Auth and Firestore
+     */
     private FirebaseAuth mAuth;
     private FirebaseFirestore mFirestore;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

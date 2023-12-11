@@ -46,7 +46,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Activity for viewing another user's profile
+ */
 public class FriendProfileActivity extends AppCompatActivity implements LikablePostAdapterDelegate {
+    /**
+     * List of quotes to display to the user
+     */
     String[] quotes = {"It does not matter how slowly you go as long as you do not stop.",
             "Quality is not an act, it is a habit.",
             "Life is 10% what happens to you and 90% how you react to it.",
@@ -61,15 +67,18 @@ public class FriendProfileActivity extends AppCompatActivity implements LikableP
      * graphView will be the graph that is displayed showing the Mood trend of a user.
      */
     GraphView graphView;
+
     /**
      * mFirestore allows the app to communicate with the database and allow
      * transactions.
      */
     private FirebaseFirestore mFirestore;
+
     /**
      * moodPostsCollection reference to access the mood collection
      */
     private CollectionReference moodPostsCollection;
+
     /**
      * userCollection reference to access the user collection
      */
@@ -81,6 +90,9 @@ public class FriendProfileActivity extends AppCompatActivity implements LikableP
     int[] userY = new int[5];
     int i = 4;
 
+    /**
+     * Display information for posts and user data
+     */
     String userUid;
     String friendUid;
     String friendUsername;
@@ -195,6 +207,10 @@ public class FriendProfileActivity extends AppCompatActivity implements LikableP
         updatePostDisplay(friendUid);
     }
 
+    /**
+     * Makes a call to the server and pulls all posts that match the uid provided
+     * @param uid Only posts made by this user id will be displayed
+     */
     private void updatePostDisplay(String uid) {
         moodPostsCollection.whereEqualTo("posterId", uid).orderBy("postTime", Query.Direction.DESCENDING).limit(50).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -228,6 +244,10 @@ public class FriendProfileActivity extends AppCompatActivity implements LikableP
                 });
     }
 
+    /**
+     * Runs a transaction to update the like count on a post
+     * @param likePostId The post being liked
+     */
     @Override
     public void onLikePost(String likePostId) {
         DocumentReference postRef = moodPostsCollection.document(likePostId);
@@ -243,6 +263,11 @@ public class FriendProfileActivity extends AppCompatActivity implements LikableP
         });
     }
 
+    /**
+     * Handles getting the current like count for each post and updating the count
+     * @param likePostId The post id of the post being displayed
+     * @param likesDisplay The TextView for the likes display
+     */
     @Override
     public void displayLikes(String likePostId, TextView likesDisplay) {
         DocumentReference postRef = moodPostsCollection.document(likePostId);

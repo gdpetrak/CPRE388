@@ -30,10 +30,19 @@ import com.google.firebase.firestore.Transaction;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for viewing an individual post and all of the comments on that post
+ */
 public class PostViewActivity extends AppCompatActivity {
+    /**
+     * Firestore references
+     */
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
 
+    /**
+     * Comments List references
+     */
     private PostCommentAdapter postAdapter;
     private List<String> commentsList;
 
@@ -128,6 +137,12 @@ public class PostViewActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * A method that is called whenever a new comment is to be created
+     * Runs a transaction that adds the comment to the list of comments for a post
+     * @param comment The String entered in the comment text box
+     * @param postid The post that the comment is being left on
+     */
     private void createComment(String comment, String postid) {
         mFirestore.runTransaction(new Transaction.Function<Transaction>() {
             @Nullable

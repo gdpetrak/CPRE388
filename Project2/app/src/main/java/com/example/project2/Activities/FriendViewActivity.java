@@ -48,15 +48,21 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The FriendViewActivity class cerates the Add Friend page, including the EditText that allows
+ * The FriendViewActivity class creates the Add Friend page, including the EditText that allows
  * a user to enter a friend's username, and the Add Friend Button which adds the username of a friend
  * to the User's list of friends.
  */
 public class FriendViewActivity extends AppCompatActivity {
 
+    /**
+     * Variables that keep track of Firestore information
+     */
     private FirebaseFirestore mFirestore;
     private CollectionReference usersCollection;
 
+    /**
+     * Variables holding data about the friend list
+     */
     FriendAdapter friendAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
     ArrayList<String> friendIds = new ArrayList<>();
@@ -133,9 +139,9 @@ public class FriendViewActivity extends AppCompatActivity {
     /**
      * Helper method that adds the friend's username to Firebase and sets the usernames
      * of the friends' of the user into a list so that it may be displayed in a ListView.
-     * @param friendUid
-     * @param userRef
-     * @param mFirestore
+     * @param friendUid The user id of the friend being added
+     * @param userRef A reference to where the user the friend is being added to is stored
+     * @param mFirestore A reference to the firestore object to make the transaction
      * @return
      */
     private Task<Void> addFriend(String friendUid, DocumentReference userRef, FirebaseFirestore mFirestore) {
@@ -167,8 +173,8 @@ public class FriendViewActivity extends AppCompatActivity {
     /**
      * helper method that helps create the necessary parameters needed for the addFriend method as
      * well as provide checks to see if the Task of adding a friend was successful.
-     * @param friendId
-     * @param mFirestore
+     * @param friendId The user id of the friend being added
+     * @param mFirestore A reference to the firestore object to make the transaction
      */
     private void addFriendButton(String friendId, FirebaseFirestore mFirestore) {
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
@@ -257,51 +263,6 @@ public class FriendViewActivity extends AppCompatActivity {
                     }
                 });
     }
-
-//    private void handleUnfollow(String friendUsername) {
-//        FirebaseAuth mAuth = FirebaseUtil.getAuth();
-//        FirebaseUser user = mAuth.getCurrentUser();
-//
-//        DocumentReference userRef = usersCollection.document(user.getUid());
-//
-//        // Fetch the current user document
-//        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot document = task.getResult();
-//                    if (document.exists()) {
-//                        // Assuming User class has a method like removeFriend
-//                        User currentUser = document.toObject(User.class);
-//                        currentUser.removeFriend(friendUsername);
-//
-//                        // Update the user document
-//                        userRef.set(currentUser)
-//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void aVoid) {
-//                                        // Remove the friend from the local list
-//                                        usernamesView.remove(friendUsername);
-//                                        // Notify the adapter of the data change
-//                                        friendAdapter.notifyDataSetChanged();
-//                                        Toast.makeText(FriendViewActivity.this, "Unfollowed " + friendUsername, Toast.LENGTH_SHORT).show();
-//                                    }
-//                                })
-//                                .addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        Log.e(TAG, "Error updating user document after unfollow", e);
-//                                    }
-//                                });
-//                    }
-//                } else {
-//                    Log.e(TAG, "Error fetching current user document", task.getException());
-//                }
-//            }
-//        });
-//    }
-
-
 }
 
 

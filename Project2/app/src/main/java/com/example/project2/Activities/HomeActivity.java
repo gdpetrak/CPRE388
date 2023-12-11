@@ -45,6 +45,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * The homescreen
+ * Handles displaying all recently made mood posts and allows the user to create their own mood
+ * posts, view other mood post comments, like posts, and navigate to other screens
+ */
 public class HomeActivity extends AppCompatActivity implements LikablePostAdapterDelegate {
     private FirebaseFirestore mFirestore;
     private CollectionReference moodPostsCollection;
@@ -176,17 +181,31 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
         updatePostDisplay();
     }
 
+    /**
+     * A method that creates a MoodPost object for the current mood post information then sends a
+     * post to the database before updating the display
+     * @param posterId The id of the user who is creating the post
+     * @param moodEntry The text entry for the mood post
+     * @param moodRating The slider bar entry for the mood post
+     */
     private void createPost(String posterId, String moodEntry, int moodRating) {
         MoodPost post = new MoodPost(posterId, moodEntry, moodRating);
         moodPostsCollection.add(post);
         updatePostDisplay();
     }
 
+    /**
+     * A method that takes in an already created MoodPost and sends it to the database
+     * @param post The MoodPost to be sent to the database
+     */
     private void createPost(MoodPost post) {
         moodPostsCollection.add(post);
         updatePostDisplay();
     }
 
+    /**
+     * Pulls post information from the database and updates the display
+     */
     private void updatePostDisplay() {
         usernamesView.clear();
         moodEntryView.clear();
@@ -224,6 +243,10 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
                 });
     }
 
+    /**
+     * Runs a transaction to update the like count on a post
+     * @param likePostId The post being liked
+     */
     @Override
     public void onLikePost(String likePostId) {
         DocumentReference postRef = moodPostsCollection.document(likePostId);
@@ -239,6 +262,11 @@ public class HomeActivity extends AppCompatActivity implements LikablePostAdapte
         });
     }
 
+    /**
+     * Handles getting the current like count for each post and updating the count
+     * @param likePostId The post id of the post being displayed
+     * @param likesDisplay The TextView for the likes display
+     */
     @Override
     public void displayLikes(String likePostId, TextView likesDisplay) {
         DocumentReference postRef = moodPostsCollection.document(likePostId);
