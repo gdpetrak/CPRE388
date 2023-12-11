@@ -58,6 +58,7 @@ public class FriendViewActivity extends AppCompatActivity {
 
     FriendAdapter friendAdapter;
     ArrayList<String> usernamesView = new ArrayList<>();
+    ArrayList<String> friendIds = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,25 +81,7 @@ public class FriendViewActivity extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseUtil.getAuth();
         FirebaseUser user = mAuth.getCurrentUser();
         String friendUid = mAuth.getUid();
-        usersCollection.whereEqualTo("uid", user.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot documentSnapshot = task.getResult();
-                            List<DocumentSnapshot> documentSnapshotList = documentSnapshot.getDocuments();
-                            if (documentSnapshotList.size() > 0) {
-                                User currUser = documentSnapshotList.get(0).toObject(User.class);
-                                List<String> friends = currUser.getFriends();
-                                for (String friend:friends) {
-                                    usernamesView.add(friend);
-                                }
-
-                            }
-
-                        }
-                    }
-                });
+        refreshFriendList();
         home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,25 +136,14 @@ public class FriendViewActivity extends AppCompatActivity {
                 String username = currUserDoc.getString("username");
                 List<String> friends = (List<String>) currUserDoc.get("friends");
 
-                // Fetch the friend's username
-                try {
-                    QuerySnapshot friendQuerySnapshot = Tasks.await(usersCollection.whereEqualTo("uid", friendUid).get());
-                    if (!friendQuerySnapshot.isEmpty()) {
-                        DocumentSnapshot friendSnapshot = friendQuerySnapshot.getDocuments().get(0);
-                        String friendUsername = friendSnapshot.getString("username");
+                // Assuming User class has a method like setFriends
+                User currentUser = new User(username, currUserDoc.getString("uid"));
 
-                        // Assuming User class has a method like setFriends
-                        User currentUser = new User(username, currUserDoc.getString("uid"));
-
-                        // Add the new friend only if it doesn't exist in the list
-                        if (!friends.contains(friendUsername)) {
-                            friends.add(friendUsername);
-                            currentUser.setFriend(friends);
-                            transaction.set(userRef, currentUser);
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error fetching friend's username", e);
+                // Add the new friend only if it doesn't exist in the list
+                if (!friends.contains(friendUid)) {
+                    friends.add(friendUid);
+                    currentUser.setFriend(friends);
+                    transaction.set(userRef, currentUser);
                 }
 
                 return null;
@@ -244,7 +216,25 @@ public class FriendViewActivity extends AppCompatActivity {
                                 System.out.println("usernamesView before update: " + usernamesView);
 
                                 // Clear the list and add all friends
-                                usernamesView.addAll(friends);
+//                                usernamesView.addAll(friends);
+                                usernamesView.clear();
+                                friendIds.clear();
+                                for (String friend:friends) {
+                                    // Fetch the friend's username
+                                   usersCollection.whereEqualTo("uid", friend).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                       @Override
+                                       public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                           QuerySnapshot friendQuerySnapshot = task.getResult();
+                                           if (!friendQuerySnapshot.isEmpty()) {
+                                               DocumentSnapshot friendSnapshot = friendQuerySnapshot.getDocuments().get(0);
+                                               String friendUsername = friendSnapshot.getString("username");
+                                               usernamesView.add(friendUsername);
+                                               friendIds.add(friend);
+                                               friendAdapter.notifyDataSetChanged();
+                                           }
+                                       }
+                                   });
+                                }
 
                                 // Notify the adapter of the data change
                                 friendAdapter.notifyDataSetChanged();
