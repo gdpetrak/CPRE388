@@ -5,11 +5,18 @@ import static android.content.ContentValues.TAG;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +49,10 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -113,6 +124,7 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
         Button backButton = findViewById(R.id.back_button);
         Button settingsButton = findViewById(R.id.settings_button);
         Button shareButton = findViewById(R.id.share_button);
+        Button shareGraphButton = findViewById(R.id.share_graph_button);
         TextView motivationalQuotes = findViewById(R.id.motivation);
         TextView usernameDisplay = findViewById(R.id.username_display);
 
@@ -162,8 +174,36 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
                 sendIntent.putExtra(Intent.EXTRA_TEXT, motivationalQuotes.getText().toString());
                 sendIntent.setType("text/plain");
 
-                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                Intent shareIntent = Intent.createChooser(sendIntent, "Share Your Motivational Quote");
                 startActivity(shareIntent);
+            }
+        });
+
+        shareGraphButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Convert the graph to an image and get the uri
+                graphView.setDrawingCacheEnabled(true);
+                Bitmap graphBitmap = Bitmap.createBitmap(graphView.getDrawingCache());
+                graphView.setDrawingCacheEnabled(false);
+                Uri graphUri = getImageUri(graphBitmap);
+
+                // Actually create the share intent with the graph uri
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.setClipData(ClipData.newRawUri("Mood Graph", graphUri));
+                shareIntent.putExtra(Intent.EXTRA_STREAM, graphUri);
+                shareIntent.setType("image/png");
+                Intent chooser = Intent.createChooser(shareIntent, "Share Your Mood Graph");
+
+                List<ResolveInfo> resInfoList = ProfileActivity.this.getPackageManager().queryIntentActivities(chooser, PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    ProfileActivity.this.grantUriPermission(packageName, graphUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+
+                startActivity(chooser);
             }
         });
 
@@ -328,5 +368,24 @@ public class ProfileActivity extends AppCompatActivity implements UserPostAdapte
                         }
                     }
                 });
+    }
+
+    public Uri getImageUri(Bitmap image) {
+        File imagesFolder = new File(getCacheDir(), "images");
+        Uri uri = null;
+        try {
+            imagesFolder.mkdirs();
+            File file = new File(imagesFolder, "shared_image.png");
+
+            FileOutputStream stream = new FileOutputStream(file);
+            image.compress(Bitmap.CompressFormat.PNG, 90, stream);
+            stream.flush();
+            stream.close();
+            uri = FileProvider.getUriForFile(this, "Project2.provider", file);
+
+        } catch (IOException e) {
+            Log.d(TAG, "IOException while trying to write file for sharing: " + e.getMessage());
+        }
+        return uri;
     }
 }

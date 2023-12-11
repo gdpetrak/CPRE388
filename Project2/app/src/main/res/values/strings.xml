@@ -46,4 +46,5 @@
     <string name="likes_73">Likes: 73</string>
     <string name="comment">Comment</string>
     <string name="share_quote">Share Quote</string>
+    <string name="share_graph">Share Graph</string>
 </resources>
